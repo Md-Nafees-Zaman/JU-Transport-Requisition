@@ -1,0 +1,230 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Dashboard Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Bank Dashboard <small class="text-muted">Financial Operations Center</small></h1>
+        <div class="btn-group">
+            <a href="{% url 'profile' %}" class="btn btn-primary">
+                <i class="bi bi-person-circle"></i> My Profile
+            </a>
+            <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#helpModal">
+                <i class="bi bi-question-circle"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Financial Quick Stats -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card border-success">
+                <div class="card-body">
+                    <h5 class="card-title">Total Processed</h5>
+                    <h2 class="text-success">৳{{ total_processed|default:"0" }}</h2>
+                    <small class="text-muted">This Month</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-warning">
+                <div class="card-body">
+                    <h5 class="card-title">Pending Approvals</h5>
+                    <h2 class="text-warning">{{ pending_count|default:"0" }}</h2>
+                    <small class="text-muted">Transactions</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-danger">
+                <div class="card-body">
+                    <h5 class="card-title">Rejected</h5>
+                    <h2 class="text-danger">{{ rejected_count|default:"0" }}</h2>
+                    <small class="text-muted">This Week</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-primary">
+                <div class="card-body">
+                    <h5 class="card-title">Verified Accounts</h5>
+                    <h2 class="text-primary">{{ verified_accounts|default:"0" }}</h2>
+                    <small class="text-muted">Active</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Authorization Section -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <i class="bi bi-shield-check"></i> Payment Authorization Queue
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Requisition ID</th>
+                            <th>Amount</th>
+                            <th>Beneficiary</th>
+                            <th>Request Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for transaction in pending_transactions %}
+                        <tr>
+                            <td>#{{ transaction.id }}</td>
+                            <td>৳{{ transaction.amount }}</td>
+                            <td>{{ transaction.beneficiary }}</td>
+                            <td>{{ transaction.request_date|date:"d M Y" }}</td>
+                            <td>
+                                <a href="{% url 'transaction_detail' transaction.id %}" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-eye"></i> Review
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center">No pending transactions</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Financial Reports Section -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="bi bi-graph-up"></i> Recent Transactions
+                </div>
+                <div class="card-body">
+                    <canvas id="transactionChart" style="height: 250px;"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="bi bi-bell"></i> System Alerts
+                </div>
+                <div class="card-body alert-list">
+                    {% for alert in financial_alerts %}
+                    <div class="alert alert-{{ alert.severity }} d-flex justify-content-between">
+                        <div>
+                            <i class="bi bi-{{ alert.icon }}"></i>
+                            {{ alert.message }}
+                        </div>
+                        <small>{{ alert.timestamp|timesince }} ago</small>
+                    </div>
+                    {% empty %}
+                    <div class="text-center text-muted">No active alerts</div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Security Verification Section -->
+    <div class="card border-danger mb-4">
+        <div class="card-header bg-danger text-white">
+            <i class="bi bi-shield-lock"></i> Security Console
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Recent Login Activity</h5>
+                    <ul class="list-group">
+                        {% for login in login_history %}
+                        <li class="list-group-item d-flex justify-content-between">
+                            <div>
+                                <i class="bi bi-{{ login.success|yesno:'check-circle-fill text-success,x-circle-fill text-danger' }}"></i>
+                                {{ login.ip_address }} ({{ login.location }})
+                            </div>
+                            <small class="text-muted">{{ login.timestamp|date:"H:i, d M" }}</small>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h5>Two-Factor Authentication</h5>
+                    <div class="alert alert-info">
+                        <i class="bi bi-shield-check"></i>
+                        Status: <strong>Active</strong>
+                        <button class="btn btn-sm btn-outline-primary float-end">
+                            Manage 2FA
+                        </button>
+                    </div>
+                    <h5>API Access</h5>
+                    <div class="alert alert-warning">
+                        <i class="bi bi-key"></i>
+                        Last Used: 2 days ago
+                        <button class="btn btn-sm btn-outline-danger float-end">
+                            Revoke Tokens
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Help Modal -->
+<div class="modal fade" id="helpModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Bank Dashboard Guide</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <h6>Key Features:</h6>
+                <ul>
+                    <li>Review and authorize pending transactions</li>
+                    <li>Monitor real-time financial metrics</li>
+                    <li>Track security and system alerts</li>
+                    <li>Manage authentication settings</li>
+                </ul>
+                <p class="text-muted">For urgent matters, contact IT Security: security@example.com</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charting Script -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const ctx = document.getElementById('transactionChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: {{ transaction_dates|safe }},
+            datasets: [{
+                label: 'Daily Transactions',
+                data: {{ transaction_amounts|safe }},
+                borderColor: '#0d6efd',
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'bottom' }
+            }
+        }
+    });
+});
+</script>
+
+<style>
+.card-header { font-weight: 500; }
+.alert-list .alert { margin-bottom: 0.5rem; }
+.table-hover tbody tr:hover { background-color: #f8f9fa; }
+</style>
+{% endblock %}

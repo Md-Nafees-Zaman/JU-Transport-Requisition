@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Home | JU Transport{% endblock %}
+
+{% block content %}
+<section class="hero-section d-flex align-items-center" style="background: linear-gradient(to bottom, rgba(4, 120, 87, 0.8), rgba(5, 150, 105, 0.9)), url('{% static "images/buss.png" %}') center/cover;">
+    <div class="container hero-content text-center text-white">
+        <h1 class="display-4 fw-bold mb-4">Jahangirnagar University Transport System</h1>
+
+        <img src="{% static 'images/buss.png' %}" alt="Bus Illustration" class="hero-image img-fluid shadow-lg">
+
+        <p class="lead mb-4">Efficiently manage transportation, track buses, and streamline your daily commute across campus.</p>
+
+        {% if user.is_authenticated %}
+        <a href="{% url 'dashboard' %}" class="btn btn-green btn-lg px-5 py-3">
+            Go to Dashboard <i class="bi bi-arrow-right"></i>
+        </a>
+        {% endif %}
+    </div>
+</section>
+
+<section class="py-6 bg-dark text-white" id="features">
+    <div class="container">
+        <h2 class="display-4 fw-bold mb-4 text-center">Our Key Features</h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100 border-0 card-hover p-4 shadow-sm" style="background-color: #f0f8ff;">
+                    <div class="feature-icon bg-success text-white mb-4">
+                        <i class="bi bi-geo-alt"></i>
+                    </div>
+                    <h3 class="mb-3">Live Tracking</h3>
+                    <p class="text-muted">Real-time location tracking of university vehicles with GPS data.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 card-hover p-4 shadow-sm" style="background-color: #eafaf1;">
+                    <div class="feature-icon bg-info text-white mb-4">
+                        <i class="bi bi-graph-up-arrow"></i>
+                    </div>
+                    <h3 class="mb-3">Data Insights</h3>
+                    <p class="text-muted">Analyze usage patterns and optimize routes based on real data.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 card-hover p-4 shadow-sm" style="background-color: #f1fae1;">
+                    <div class="feature-icon bg-warning text-white mb-4">
+                        <i class="bi bi-shield-check"></i>
+                    </div>
+                    <h3 class="mb-3">Secure Access</h3>
+                    <p class="text-muted">User authentication and encrypted systems for protected access.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

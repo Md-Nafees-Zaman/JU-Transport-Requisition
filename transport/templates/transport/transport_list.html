@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Transport List</h2>
+    <table class="table table-bordered table-hover mt-3">
+        <thead class="table-light">
+            <tr>
+                <th>Vehicle ID</th>
+                <th>Type</th>
+                <th>Model</th>
+                <th>Registration Number</th>
+                <th>Seats</th>
+                <th>Rent/Hour</th>
+                <th>Status</th>
+                <th>Driver</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for transport in transports %}
+            <tr>
+                <td>{{ transport.vehicle_id }}</td>
+                <td>{{ transport.type }}</td>
+                <td>{{ transport.model }}</td>
+                <td>{{ transport.registration_number }}</td>
+                <td>{{ transport.number_of_seats }}</td>
+                <td>{{ transport.rent_per_hour }}</td>
+                <td>{{ transport.availability_status }}</td>
+                <td>{{ transport.driver }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="8" class="text-center text-muted">No transports found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

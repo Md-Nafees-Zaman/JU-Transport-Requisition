@@ -12,8 +12,8 @@
             <a href="{% url 'profile' %}" class="btn btn-primary">
                 <i class="bi bi-person-gear"></i> My Profile
             </a>
-            {% comment %} <a href="{% url 'create_requisition' %}" class="btn btn-success"> {% endcomment %}
-                <i class="bi bi-plus-circle"></i> New Requisition
+            <a href="{% url 'reserve_transport' %}" class="btn btn-outline-info">
+                <i class="bi bi-car-front-fill"></i> Reserve Transport
             </a>
         </div>
     </div>
@@ -120,8 +120,7 @@
                             <div>
                                 <h6 class="mb-1">{{ schedule.purpose }}</h6>
                                 <small class="text-muted">
-                                    {{ schedule.transport_date|date:"D, d M Y" }} 
-                                    • {{ schedule.vehicle_type }}
+                                    {{ schedule.transport_date|date:"D, d M Y" }} • {{ schedule.vehicle_type }}
                                 </small>
                             </div>
                             <span class="badge bg-primary rounded-pill">

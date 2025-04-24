@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5 p-4 rounded" style="background-color: #a9c5de;">
+    <h2 class="mb-4 text-center">Reserve Transport</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-success btn-lg d-block mx-auto">Apply For Reserve</button>
+    </form>
+</div>
+{% endblock %}

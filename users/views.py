@@ -86,12 +86,58 @@ def transport_dashboard(request):
     }
     return render(request, 'users/dashboards/transport_dashboard.html', context)
 
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
+from .models import User
+from django.core.paginator import Paginator
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect
+from django.core.paginator import Paginator
+from django.db import models
+from .models import User  # Replace with get_user_model() if using a custom user model
+
+from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
+from django.db import models
+from django.shortcuts import render, redirect
+from users.models import User
+from transport.models import Transport
+
 @login_required
 def registrar_dashboard(request):
-    if request.user.role != 'registrar':
-        return redirect('homepage')
-    return render(request, 'users/dashboards/registrar_dashboard.html', {'user': request.user})
+    if not request.user.role == 'registrar':
+        return redirect('unauthorized')
 
+    # User search and pagination
+    query = request.GET.get('q')
+    users = User.objects.all().order_by('-date_joined')
+
+    if query:
+        users = users.filter(
+            models.Q(name__icontains=query) |
+            models.Q(email__icontains=query) |
+            models.Q(employee_ID__icontains=query)
+        )
+
+    paginator = Paginator(users, 25)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    # Corrected transport counts using availability_status
+    available_transports = Transport.objects.filter(availability_status='available').count()
+    total_transports = Transport.objects.count()
+
+    context = {
+        'institution_name': "Jahangirnagar University",
+        'academic_year': "2023/2024",
+        'total_users': User.objects.count(),
+        'all_users': User.objects.all().order_by('-date_joined'),
+        'page_obj': page_obj,
+        'available_transports': available_transports,
+        'total_transports': total_transports,
+    }
+
+    return render(request, 'users/dashboards/registrar_dashboard.html', context)
 @login_required
 def bank_dashboard(request):
     if request.user.role != 'bank':
@@ -122,3 +168,13 @@ def signup(request):
     else:
         form = EmailSignupForm()
     return render(request, 'users/signup.html', {'form': form})
+
+
+# users/views.py
+from django.views.generic import DetailView
+from .models import User
+
+class UserProfileView(DetailView):
+    model = User
+    template_name = 'users/user_profile.html'
+    context_object_name = 'profile_user'

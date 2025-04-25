@@ -1,6 +1,7 @@
 from django.urls import path
 from django.contrib.auth import views as auth_views
 from . import views
+from .views import UserProfileView
 
 urlpatterns = [
     path('', views.homepage, name='homepage'),
@@ -9,7 +10,7 @@ urlpatterns = [
     path('login/', views.CustomLoginView.as_view(), name='login'),
     path('logout/', views.logout_user, name='logout'),
     path('profile/', views.profile, name='profile'),
-    
+      path('profile/<int:pk>/', UserProfileView.as_view(), name='user_profile'),
     # Dashboard URLs
     path('dashboard/', views.dashboard_redirect, name='dashboard'),
     path('employee/dashboard/', views.employee_dashboard, name='employee_dashboard'),
@@ -40,4 +41,5 @@ urlpatterns = [
              template_name='users/password_reset_complete.html'
          ),
          name='password_reset_complete'),
+         
 ]

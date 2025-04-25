@@ -14,19 +14,12 @@ class User(AbstractUser):
     phone = models.CharField(max_length=15)
     department = models.CharField(max_length=100)
     designation = models.CharField(max_length=100)
-    email = models.EmailField(unique=True)  # Keep unique email
+    email = models.EmailField(unique=True)
     address = models.TextField()
     employee_ID = models.CharField(max_length=50, unique=True)
 
-    # Keep username as USERNAME_FIELD for admin
-    USERNAME_FIELD = 'username'  
-    # Make email required
-    REQUIRED_FIELDS = ['email']  
+    USERNAME_FIELD = 'username'
+    REQUIRED_FIELDS = ['email']
 
     def __str__(self):
         return f"{self.username} ({self.role})"
-    
-
-
-
-

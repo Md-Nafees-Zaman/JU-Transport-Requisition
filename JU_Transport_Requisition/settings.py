@@ -40,6 +40,8 @@ INSTALLED_APPS = [
     'users',
     'transport',
     'employee',
+    'registrar',
+
 
 ]
 

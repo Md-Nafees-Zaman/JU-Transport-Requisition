@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>{{ profile_user.name }}'s Profile</h2>
+    <div class="card">
+        <div class="card-body">
+            <p><strong>Employee ID:</strong> {{ profile_user.employee_ID }}</p>
+            <p><strong>Role:</strong> {{ profile_user.get_role_display }}</p>
+            <p><strong>Department:</strong> {{ profile_user.department }}</p>
+            <p><strong>Email:</strong> {{ profile_user.email }}</p>
+            <p><strong>Joined Date:</strong> {{ profile_user.date_joined|date:"d M Y" }}</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

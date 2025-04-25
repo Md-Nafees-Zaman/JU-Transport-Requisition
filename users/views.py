@@ -1,13 +1,17 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
+from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView
 from django.urls import reverse
-from .forms import UserRegistrationForm, UserUpdateForm, UserLoginForm
-
-from django.shortcuts import render, redirect
-from .forms import UserRegistrationForm
-from django.contrib import messages
+from .forms import (
+    UserRegistrationForm, 
+    UserUpdateForm, 
+    UserLoginForm, 
+    EmailSignupForm
+)
+from transport.models import Transport
+from employee.models import TransportReservation
 
 def register(request):
     if request.method == 'POST':
@@ -15,12 +19,11 @@ def register(request):
         if form.is_valid():
             form.save()
             messages.success(request, "Registration successful. You can now log in.")
-            return redirect('login')  # Redirect to login after successful registration
+            return redirect('login')
         else:
             messages.error(request, "Please correct the errors below.")
     else:
         form = UserRegistrationForm()
-
     return render(request, 'users/register.html', {'form': form})
 
 class CustomLoginView(LoginView):
@@ -29,14 +32,13 @@ class CustomLoginView(LoginView):
     redirect_authenticated_user = True
 
     def get_success_url(self):
-        user = self.request.user
         role_redirects = {
             'employee': 'employee_dashboard',
             'registrar': 'registrar_dashboard',
             'transport': 'transport_dashboard',
             'bank': 'bank_dashboard'
         }
-        return reverse(role_redirects.get(user.role, 'homepage'))
+        return reverse(role_redirects.get(self.request.user.role, 'homepage'))
 
 @login_required
 def profile(request):
@@ -53,12 +55,36 @@ def profile(request):
 def homepage(request):
     return render(request, 'users/homepage.html')
 
-# Dashboard views remain the same
 @login_required
 def employee_dashboard(request):
     if request.user.role != 'employee':
         return redirect('homepage')
-    return render(request, 'users/dashboards/employee_dashboard.html', {'user': request.user})
+    
+    requisitions = TransportReservation.objects.filter(user=request.user)
+    
+    context = {
+        'user': request.user,
+        'pending_requisitions': requisitions.filter(approval_status='Pending').count(),
+        'approved_requests': requisitions.filter(approval_status='Approved').count(),
+        'recent_requisitions': requisitions.order_by('-created_at')[:5],
+        'transport_schedule': requisitions.filter(approval_status='Approved')[:3]
+    }
+    return render(request, 'users/dashboards/employee_dashboard.html', context)
+
+@login_required
+def transport_dashboard(request):
+    if request.user.role != 'transport':
+        return redirect('homepage')
+
+    context = {
+        'user': request.user,
+        'applications': TransportReservation.objects.all().order_by('-reservation_date'),
+        'ongoing_transports': TransportReservation.objects.filter(approval_status='Approved').count(),
+        'available_vehicles': Transport.objects.filter(availability_status='available').count(),
+        'active_transports': Transport.objects.filter(availability_status='available'),
+        'map_center': '23.7806,90.2792'
+    }
+    return render(request, 'users/dashboards/transport_dashboard.html', context)
 
 @login_required
 def registrar_dashboard(request):
@@ -67,17 +93,10 @@ def registrar_dashboard(request):
     return render(request, 'users/dashboards/registrar_dashboard.html', {'user': request.user})
 
 @login_required
-def transport_dashboard(request):
-    if request.user.role != 'transport':
-        return redirect('homepage')
-    return render(request, 'users/dashboards/transport_dashboard.html', {'user': request.user})
-
-@login_required
 def bank_dashboard(request):
     if request.user.role != 'bank':
         return redirect('homepage')
     return render(request, 'users/dashboards/bank_dashboard.html', {'user': request.user})
-
 
 @login_required
 def dashboard_redirect(request):
@@ -87,30 +106,18 @@ def dashboard_redirect(request):
         'transport': 'transport_dashboard',
         'bank': 'bank_dashboard'
     }
-    role = request.user.role
-    return redirect(role_redirects.get(role, 'homepage'))
-
-from django.contrib.auth import logout
-from django.contrib import messages
-from django.shortcuts import redirect
+    return redirect(role_redirects.get(request.user.role, 'homepage'))
 
 def logout_user(request):
     logout(request)
     messages.success(request, "")
-    return redirect('homepage')  # Change 'homepage' to your actual homepage URL name if needed
-
-
-
-# views.py
-from django.shortcuts import render, redirect
-from .forms import EmailSignupForm
+    return redirect('homepage')
 
 def signup(request):
     if request.method == 'POST':
         form = EmailSignupForm(request.POST)
         if form.is_valid():
-            user = form.save()
-            # Add your post-registration logic here
+            form.save()
             return redirect('verification_sent')
     else:
         form = EmailSignupForm()

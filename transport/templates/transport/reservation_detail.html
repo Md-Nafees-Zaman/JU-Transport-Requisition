@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Reservation Details</h1>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <p><strong>Applicant:</strong> {{ reservation.user.username }}</p>
+            <p><strong>Reservation Date:</strong> {{ reservation.reservation_date|date:"d M Y" }}</p>
+            <p><strong>From:</strong> {{ reservation.from_time }}</p>
+            <p><strong>To:</strong> {{ reservation.to_time }}</p>
+            <p><strong>Destination:</strong> {{ reservation.destination }}</p>
+            <p><strong>Reservation Type:</strong> {{ reservation.reservation_type }}</p>
+            <p><strong>Transport Type:</strong> {{ reservation.transport_type }}</p>
+            
+            <!-- Display approval status -->
+            <p><strong>Status:</strong> 
+                {% if reservation.approval_status == 'Approved' %}
+                    <span class="badge bg-success">Approved</span>
+                {% elif reservation.approval_status == 'Rejected' %}
+                    <span class="badge bg-danger">Rejected</span>
+                {% else %}
+                    <span class="badge bg-warning">Pending</span>
+                {% endif %}
+            </p>
+
+            {% if reservation.approval_status == 'Rejected' %}
+                <p><strong>Rejection Reason:</strong> {{ reservation.rejection_reason }}</p>
+            {% endif %}
+
+            <!-- Approve/Reject Buttons -->
+            {% if reservation.approval_status == 'Pending' %}
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" name="approve" class="btn btn-success">Approve</button>
+                <button type="submit" name="reject" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#rejectionModal">Reject</button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Rejection Reason Modal -->
+    <div class="modal fade" id="rejectionModal" tabindex="-1" aria-labelledby="rejectionModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="rejectionModalLabel">Rejection Reason</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <textarea name="rejection_reason" class="form-control" rows="4" placeholder="Please provide a reason for rejection"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-danger">Reject</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

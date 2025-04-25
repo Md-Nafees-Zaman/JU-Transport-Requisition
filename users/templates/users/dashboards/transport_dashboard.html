@@ -2,38 +2,25 @@
 
 {% block content %}
 <div class="container mt-4">
-    <!-- Add Transport Button -->
-  
-    <!-- Dashboard Header with Fleet Info -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <div class="text-end mb-3">
-                <a href="{% url 'add_transport' %}" class="btn btn-success">
-                    <i class="bi bi-plus-lg"></i> Add Transport
-                </a>
-            </div>
-            <a href="{% url 'transport_list' %}" class="btn btn-outline-secondary">
-                <i class="bi bi-list-ul"></i> Transport List
-            </a>
-            
-        
-            <h1>Transport Dashboard <small class="text-muted">Fleet Management System</small></h1>
-            <p class="text-muted">Active Vehicles: {{ active_vehicles }}</p>
-        </div>
-        <div class="btn-group">
-            <a href="{% url 'profile' %}" class="btn btn-primary">
-                <i class="bi bi-truck"></i> Fleet Profile
-            </a>
-            <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#newAssignment">
-                <i class="bi bi-plus-circle"></i> New Assignment
-            </button>
-        </div>
-    </div>
+   <!-- Dashboard Header -->
+   <div class="d-flex justify-content-between align-items-center mb-4">
+       <div>
+           <h1>Transport Dashboard</h1>
+       </div>
+       <div>
+           <a href="{% url 'transport_list' %}" class="btn btn-outline-secondary me-2">
+               <i class="bi bi-list-ul"></i> Transport List
+           </a>
+           <a href="{% url 'add_transport' %}" class="btn btn-success">
+               <i class="bi bi-plus-lg"></i> Add Transport
+           </a>
+       </div>
+   </div>
 
     <!-- Fleet Overview -->
     <div class="row mb-4">
         <!-- Active Transports -->
-        <div class="col-md-3">
+        <div class="col-md-6">
             <div class="card border-primary">
                 <div class="card-body">
                     <h5 class="card-title">Active Transports</h5>
@@ -42,18 +29,9 @@
                 </div>
             </div>
         </div>
-        <!-- Maintenance Due -->
-        <div class="col-md-3">
-            <div class="card border-warning">
-                <div class="card-body">
-                    <h5 class="card-title">Maintenance Due</h5>
-                    <h2 class="text-warning">{{ maintenance_due }}</h2>
-                    <small class="text-muted">Vehicles</small>
-                </div>
-            </div>
-        </div>
+
         <!-- Available Vehicles -->
-        <div class="col-md-3">
+        <div class="col-md-6">
             <div class="card border-success">
                 <div class="card-body">
                     <h5 class="card-title">Available Vehicles</h5>
@@ -62,111 +40,59 @@
                 </div>
             </div>
         </div>
-        <!-- Active Drivers -->
-        <div class="col-md-3">
-            <div class="card border-danger">
-                <div class="card-body">
-                    <h5 class="card-title">Active Drivers</h5>
-                    <h2 class="text-danger">{{ active_drivers }}</h2>
-                    <small class="text-muted">On Duty</small>
-                </div>
-            </div>
+    </div>
+<!-- Application List Section -->
+<div class="card mb-4">
+    <div class="card-header bg-info text-white">
+        <i class="bi bi-file-earmark-text"></i> Transport Reservation Applications
+    </div>
+    <div class="card-body">
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>Reservation Date</th>
+                    <th>From - To</th>
+                    <th>Destination</th>
+                    <th>Reservation Type</th>
+                    <th>Transport Type</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for app in applications %}
+                <tr>
+                    <td>{{ app.reservation_date|date:"d M Y" }}</td>
+                    <td>{{ app.from_time }} - {{ app.to_time }}</td>
+                    <td>{{ app.destination }}</td>
+                    <td>{{ app.reservation_type }}</td>
+                    <td>{{ app.transport_type }}</td>
+                    <td>
+                        <!-- View Details Button -->
+                        <a href="{% url 'reservation_detail' app.id %}" class="btn btn-primary btn-sm">View Details</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center text-muted">No transport reservations found</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+    <!-- Live Transport Map -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <i class="bi bi-geo-alt"></i> Live Transport Tracker
+        </div>
+        <div class="card-body">
+            <div id="transportMap" style="height: 400px;"></div>
         </div>
     </div>
 
-    <!-- Live Transport Management Section -->
-    <div class="row">
-        <!-- Map Tracker -->
-        <div class="col-md-8">
-            <div class="card mb-4">
-                <div class="card-header bg-primary text-white">
-                    <i class="bi bi-geo-alt"></i> Live Transport Tracker
-                </div>
-                <div class="card-body">
-                    <div id="transportMap" style="height: 400px;"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Maintenance Alerts -->
-        <div class="col-md-4">
-            <div class="card mb-4">
-                <div class="card-header bg-warning text-dark">
-                    <i class="bi bi-exclamation-triangle"></i> Maintenance Alerts
-                </div>
-                <div class="card-body">
-                    <div class="list-group">
-                        {% for alert in maintenance_alerts %}
-                        <div class="list-group-item d-flex justify-content-between">
-                            <div>
-                                <h6>{{ alert.vehicle }}</h6>
-                                <small>{{ alert.type }}</small>
-                            </div>
-                            <span class="badge bg-danger">{{ alert.days_remaining }} days</span>
-                        </div>
-                        {% empty %}
-                        <div class="text-center text-muted">No maintenance alerts</div>
-                        {% endfor %}
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Driver & Vehicle Management -->
-    <div class="row">
-        <!-- Driver Availability -->
-        <div class="col-md-6">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <i class="bi bi-person-badge"></i> Driver Availability
-                </div>
-                <div class="card-body">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>Driver</th>
-                                <th>Status</th>
-                                <th>Current Assignment</th>
-                                <th>Hours Logged</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for driver in driver_status %}
-                            <tr>
-                                <td>{{ driver.name }}</td>
-                                <td><span class="badge bg-{{ driver.status_badge }}">{{ driver.status }}</span></td>
-                                <td>{{ driver.assignment|default:"None" }}</td>
-                                <td>{{ driver.hours }} hrs</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- Fleet Analytics -->
-        <div class="col-md-6">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <i class="bi bi-speedometer2"></i> Fleet Analytics
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <canvas id="fuelUsageChart"></canvas>
-                        </div>
-                        <div class="col-md-6">
-                            <canvas id="maintenanceCostChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Incident Reports -->
+    <!-- Recent Incidents -->
     <div class="card border-danger mb-4">
         <div class="card-header bg-danger text-white">
             <i class="bi bi-clipboard-x"></i> Recent Incidents
@@ -190,45 +116,10 @@
     </div>
 </div>
 
-<!-- Modal: New Assignment -->
-<div class="modal fade" id="newAssignment" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title"><i class="bi bi-truck"></i> New Transport Assignment</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <form id="assignmentForm">
-                    <div class="mb-3">
-                        <label class="form-label">Select Vehicle</label>
-                        <select class="form-select">
-                            {% for vehicle in available_vehicles_list %}
-                            <option>{{ vehicle }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Select Driver</label>
-                        <select class="form-select">
-                            {% for driver in available_drivers %}
-                            <option>{{ driver }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <button type="submit" class="btn btn-primary w-100">
-                        <i class="bi bi-send-check"></i> Create Assignment
-                    </button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Scripts: Map + Charts -->
+<!-- Script Section for Map -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const map = L.map('transportMap').setView([{{ map_center }}], 13);
+    const map = L.map('transportMap').setView([{{ map_center|default:'23.7806,90.2792' }}], 13); // Default map center if not provided
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
     {% for transport in active_transports %}
@@ -236,18 +127,7 @@ document.addEventListener('DOMContentLoaded', function() {
         .addTo(map)
         .bindPopup(`<b>{{ transport.vehicle }}</b><br>{{ transport.driver }}`);
     {% endfor %}
-
-    new Chart(document.getElementById('fuelUsageChart'), {
-        type: 'doughnut',
-        data: {{ fuel_data|safe }},
-        options: { plugins: { legend: { position: 'bottom' } } }
-    });
-
-    new Chart(document.getElementById('maintenanceCostChart'), {
-        type: 'bar',
-        data: {{ maintenance_data|safe }},
-        options: { responsive: true }
-    });
 });
 </script>
+
 {% endblock %}

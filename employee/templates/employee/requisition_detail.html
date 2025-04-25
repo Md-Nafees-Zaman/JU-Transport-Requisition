@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h2>Requisition Details #{{ requisition.id }}</h2>
+        </div>
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-3">Reservation Date:</dt>
+                <dd class="col-sm-9">{{ requisition.reservation_date|date:"d M Y" }}</dd>
+
+                <dt class="col-sm-3">Time Slot:</dt>
+                <dd class="col-sm-9">{{ requisition.from_time }} - {{ requisition.to_time }}</dd>
+
+                <dt class="col-sm-3">Destination:</dt>
+                <dd class="col-sm-9">{{ requisition.destination }}</dd>
+
+                <dt class="col-sm-3">Transport Type:</dt>
+                <dd class="col-sm-9">{{ requisition.get_transport_type_display }}</dd>
+
+                <dt class="col-sm-3">Status:</dt>
+                <dd class="col-sm-9">
+                    <span class="badge bg-{{ requisition.status_badge }}">
+                        {{ requisition.get_approval_status_display }}
+                    </span>
+                </dd>
+
+                {% if requisition.rejection_reason %}
+                <dt class="col-sm-3">Rejection Reason:</dt>
+                <dd class="col-sm-9 text-danger">{{ requisition.rejection_reason }}</dd>
+                {% endif %}
+
+                <dt class="col-sm-3">Created At:</dt>
+                <dd class="col-sm-9">{{ requisition.created_at|date:"d M Y H:i" }}</dd>
+            </dl>
+            
+            <a href="{% url 'employee_dashboard' %}" class="btn btn-primary">
+                <i class="bi bi-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

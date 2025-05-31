@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h1 class="display-4 fw-bold">JU Transport Pricing</h1>
+            <p class="lead text-muted">Transparent pricing for all university transport needs</p>
+        </div>
+        
+        <!-- Pricing Structure -->
+        <div class="card mb-5">
+            <div class="card-body">
+                <h2 class="mb-4">Vehicle Types & Base Fares</h2>
+                <div class="row g-4">
+                    {% for type_code, vehicle in vehicle_types.items %}
+                    <div class="col-md-6 col-lg-3">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-body text-center">
+                                <div class="feature-icon mx-auto bg-primary-light text-primary mb-3">
+                                    <i class="bi {{ vehicle.icon }} fs-3"></i>
+                                </div>
+                                <h4 class="mb-3">{{ vehicle.name }}</h4>
+                                <h3 class="text-primary mb-3">৳{{ vehicle.base_fare }}</h3>
+                                <p class="text-muted mb-2">
+                                    <i class="bi bi-people me-2"></i> {{ vehicle.capacity }}
+                                </p>
+                                <p class="text-muted mb-0">
+                                    <i class="bi bi-signpost-2 me-2"></i> ৳{{ vehicle.per_km }}/km
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Time-based Pricing -->
+        <div class="card mb-5">
+            <div class="card-body">
+                <h2 class="mb-4">Time Slot Multipliers</h2>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead class="bg-primary-light">
+                            <tr>
+                                <th>Time Slot</th>
+                                <th>Multiplier</th>
+                                <th>Example Calculation</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for slot_code, slot in time_slots.items %}
+                            <tr>
+                                <td>{{ slot.name }}</td>
+                                <td>{{ slot.multiplier }}x base fare</td>
+                                <td>
+                                    {% if slot_code == 'normal' %}
+                                    Bus: 500 × 1.0 = ৳500
+                                    {% elif slot_code == 'peak' %}
+                                    Bus: 500 × 1.2 = ৳600
+                                    {% elif slot_code == 'late_night' %}
+                                    Bus: 500 × 1.5 = ৳750
+                                    {% else %}
+                                    Bus: 500 × 2.0 = ৳1000
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Additional Services -->
+        <div class="card mb-5">
+            <div class="card-body">
+                <h2 class="mb-4">Additional Services</h2>
+                <div class="row g-4">
+                    {% for service in additional_services %}
+                    <div class="col-md-6 col-lg-3">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-body">
+                                <h5 class="mb-3">{{ service.name }}</h5>
+                                <h4 class="text-primary">
+                                    {% if service.price|stringformat:"s" == "1.5x one-way" %}
+                                    1.5× one-way fare
+                                    {% else %}
+                                    ৳{{ service.price }}
+                                    {% endif %}
+                                </h4>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sample Calculations -->
+        <div class="card">
+            <div class="card-body">
+                <h2 class="mb-4">Sample Price Calculations</h2>
+                <div class="row g-4">
+                    {% for example in sample_calculations %}
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-body">
+                                <h5 class="mb-3">{{ example.description }}</h5>
+                                <p class="text-muted">{{ example.calculation }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <div class="mt-4 text-center">
+                    <div class="alert bg-primary-light border-0">
+                        <h4 class="mb-3">University Policy</h4>
+                        <p class="mb-0">
+                            Official university trips are subsidized at 50% rate. 
+                            Personal trips require full payment. Departmental trips 
+                            should be approved by the head of department.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Calculator CTA -->
+        <div class="text-center mt-5">
+            <h3 class="mb-4">Need an exact quote for your trip?</h3>
+            <a href="{% url 'dashboard_redirect' %}" class="btn btn-primary btn-lg px-5">
+                <i class="bi bi-calculator me-2"></i> Use Our Trip Calculator
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}

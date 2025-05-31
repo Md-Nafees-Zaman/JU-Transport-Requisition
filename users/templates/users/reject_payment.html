@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-danger text-white">
+            <h2>Reject Payment #{{ payment.id }}</h2>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="mb-4">
+                    <h4>Payment Details</h4>
+                    <p>Amount: ৳{{ payment.amount }}</p>
+                    <p>Employee: {{ payment.requisition.user.name }}</p>
+                </div>
+                
+                <div class="mb-3">
+                    {{ form.remarks.label_tag }}
+                    {{ form.remarks }}
+                    {% if form.remarks.errors %}
+                    <div class="text-danger">{{ form.remarks.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="d-flex justify-content-between">
+                    <a href="{% url 'payment_detail' payment.id %}" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Cancel
+                    </a>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-x-circle"></i> Confirm Rejection
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,198 +1,647 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-        <title>{% block title %}JU Transport - Smart Logistics Management{% endblock %}</title>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}JU Transport | Smart Logistics Platform{% endblock %}</title>
     
-        <!-- Bootstrap & Icons -->
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
+    <!-- Meta Tags for SEO -->
+    <meta name="description" content="Premium transport management system for Jahangirnagar University with advanced logistics features">
+    <meta name="keywords" content="transport management, logistics, fleet tracking, JU Transport">
     
-        <style>
-            :root {
-                --primary-green: #059669;
-                --dark-green: #047857;
-                --accent-light: #d1fae5;
-                --text-gray: #374151;
-            }
+    <!-- Favicon -->
+    <link rel="icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon">
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'images/apple-touch-icon.png' %}">
     
-            body {
-                padding-top: 80px; /* Adjust to create space for the fixed navbar */
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Manrope:wght@500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css">
+    
+    <style>
+        :root {
+            --primary: #006F46;
+            --primary-light: #E6F2ED;
+            --primary-dark: #005538;
+            --secondary: #1A56DB;
+            --accent: #E74694;
+            --dark: #111827;
+            --light: #F9FAFB;
+            --gray: #6B7280;
+            --border-radius: 12px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--dark);
+            background-color: var(--light);
+            line-height: 1.6;
+            overflow-x: hidden;
+            padding-top: 1in;
+        }
+
+        /* Typography */
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Manrope', sans-serif;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .display-1 {
+            font-size: 4rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            box-shadow: var(--shadow-sm);
+            padding: 1rem 0;
+            transition: var(--transition);
+        }
+
+        .navbar.scrolled {
+            padding: 0.75rem 0;
+            box-shadow: var(--shadow-md);
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar-brand img {
+            height: 40px;
+            width: auto;
+            transition: var(--transition);
+        }
+
+        .nav-link {
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            margin: 0 0.25rem;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+        }
+
+        .nav-link:hover {
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .nav-link.active {
+            color: white;
+            background: var(--primary);
+        }
+
+        /* Buttons */
+        .btn {
+            font-weight: 600;
+            padding: 0.75rem 1.75rem;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+            border: none;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            box-shadow: 0 4px 6px rgba(0, 111, 70, 0.15);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 111, 70, 0.2);
+        }
+
+        .btn-outline-primary {
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            background: transparent;
+        }
+
+        .btn-outline-primary:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Cards */
+        .card {
+            border: none;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+            background: white;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* Hero Section */
+        .hero-section {
+            position: relative;
+            overflow: hidden;
+            padding: 8rem 0 6rem;
+            background: linear-gradient(135deg, rgba(0, 111, 70, 0.95) 0%, rgba(0, 85, 56, 0.95) 100%),
+                        url('{% static "images/transport-hero-bg.jpg" %}') no-repeat center center/cover;
+            color: white;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-image-container {
+            position: relative;
+        }
+
+        .hero-image {
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg);
+            width: 100%;
+            height: auto;
+            object-fit: cover;
+        }
+
+        /* Feature Icons */
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: var(--border-radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            color: white;
+            background: var(--primary);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Dashboard Layout */
+        .dashboard-wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: white;
+            box-shadow: var(--shadow-md);
+            position: fixed;
+            height: 100vh;
+            z-index: 100;
+            padding: 2rem 0;
+        }
+
+        .sidebar-logo {
+            padding: 0 1.5rem 2rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .sidebar-logo img {
+            height: 36px;
+            width: auto;
+        }
+
+        .sidebar-nav .nav-link {
+            padding: 0.75rem 1.5rem;
+            margin: 0.25rem 1rem;
+            color: var(--gray);
+        }
+
+        .sidebar-nav .nav-link.active {
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .sidebar-nav .nav-link:hover {
+            color: var(--primary);
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            background: var(--light);
+            padding: 2rem;
+        }
+
+        /* DataTables Customization */
+        .dataTables_wrapper .dataTables_filter input {
+            border: 1px solid #E5E7EB;
+            border-radius: var(--border-radius);
+            padding: 0.5rem 1rem;
+        }
+
+        table.dataTable {
+            border-collapse: separate !important;
+            border-spacing: 0;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+        }
+
+        table.dataTable thead th {
+            background: var(--primary-light);
+            color: var(--primary);
+            border-bottom: none !important;
+            padding: 1rem;
+        }
+
+        table.dataTable tbody td {
+            padding: 1rem;
+            border-bottom: 1px solid #E5E7EB;
+        }
+
+        /* Pricing Cards */
+        .pricing-card.highlight {
+            border: 2px solid var(--primary);
+            transform: scale(1.03);
+        }
+
+        /* Contact Form */
+        .contact-info-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+        }
+
+        .contact-info-icon {
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-right: 1rem;
+            margin-top: 0.25rem;
+        }
+
+        /* Form Validation */
+        .was-validated .form-control:valid {
+            border-color: var(--primary);
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%23006F46' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
+        }
+
+        .was-validated .form-control:invalid {
+            border-color: #dc3545;
+        }
+
+        .invalid-feedback {
+            color: #dc3545;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--dark);
+            color: white;
+            padding: 5rem 0 2rem;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .footer-logo img {
+            height: 32px;
+            width: auto;
+            margin-right: 0.75rem;
+        }
+
+        .footer-links h5 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: white;
+        }
+
+        .footer-links ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.75rem;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: white;
+            padding-left: 5px;
+        }
+
+        .social-links a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            margin-right: 0.75rem;
+            transition: var(--transition);
+        }
+
+        .social-links a:hover {
+            background: var(--primary);
+            transform: translateY(-3px);
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 992px) {
+            .display-1 {
+                font-size: 3rem;
             }
             
-            .hero-section {
-                background: linear-gradient(rgba(4, 120, 87, 0.85), rgba(5, 150, 105, 0.85)),
-                            url('{% static "images/hero-transport-green.jpg" %}');
-                background-size: cover;
-                background-position: center;
-                color: white;
-                min-height: 80vh;
-                position: relative;
+            .dashboard-wrapper {
+                flex-direction: column;
             }
-    
-            .hero-section h1 {
-                font-size: 3rem;
-                font-weight: 700;
-                color: #ffffff;
-                text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
-                letter-spacing: 2px;
-                text-transform: uppercase;
-                margin-top: 100px;
-                text-align: center;
-            }
-    
-            .hero-content {
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                text-align: center;
-            }
-    
-            .hero-section p {
-                font-size: 1.25rem;
-                font-weight: bold;
-                color: #ffffff;
-                text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
-                margin-bottom: 40px;
-            }
-    
-            .hero-image {
-                max-height: 500px;
+            
+            .sidebar {
                 width: 100%;
-                object-fit: contain;
-                margin-bottom: 30px;
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+                height: auto;
+                position: relative;
+                padding: 1rem 0;
             }
-    
-            .feature-icon {
-                width: 70px;
-                height: 70px;
-                border-radius: 15px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 1.8rem;
-                transition: all 0.3s ease;
+            
+            .main-content {
+                margin-left: 0;
+                padding: 1.5rem;
             }
-    
-            .card-hover {
-                transition: transform 0.3s ease;
-            }
-    
-            .card-hover:hover {
-                transform: translateY(-5px);
-            }
-    
-            .btn-green {
-                background-color: var(--primary-green);
-                border-color: var(--primary-green);
-                color: white;
-            }
-    
-            .btn-green:hover {
-                background-color: var(--dark-green);
-                border-color: var(--dark-green);
-            }
-    
-            /* Navbar Styles */
-            .navbar {
-                z-index: 1050; /* Ensure it's on top of other content */
-            }
-        </style>
-    </head>
-    
-<body class="bg-light">
+        }
 
-<!-- Navigation -->
-<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
-    <div class="container">
-        <a class="navbar-brand d-flex align-items-center" href="#">
-            <img src="{% static 'images/ju.png' %}" alt="Your Image" class="ms-3" style="height: 40px;"> <!-- Image added to the right -->
-            <span class="ms-2">JU Transport</span> <!-- This is the text part -->
-        </a>
-        
-        <div class="d-flex align-items-center">
-            <div class="dropdown">
-                <a class="btn btn-green px-4 dropdown-toggle d-flex align-items-center" href="#" role="button"
-                   data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="bi bi-person-circle me-2"></i> Account
-                </a>
-                <ul class="dropdown-menu dropdown-menu-end">
+        @media (max-width: 768px) {
+            .display-1 {
+                font-size: 2.5rem;
+            }
+        }
+
+        /* Utility Classes */
+        .rounded-lg {
+            border-radius: var(--border-radius);
+        }
+
+        .text-primary-light {
+            color: var(--primary-light);
+        }
+
+        .bg-primary-light {
+            background: var(--primary-light);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="{% url 'homepage' %}">
+                <img src="{% static 'images/ju.png' %}" alt="JU Logo" class="me-2" style="height: 40px;">
+                <span class="fw-bold">JU Transport</span>
+            </a>
+    
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+                <i class="bi bi-list"></i>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="mainNav">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="{% url 'homepage' %}">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if 'pricing' in request.path %}active{% endif %}" href="{% url 'pricing' %}">Pricing</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if 'contact' in request.path %}active{% endif %}" href="{% url 'contact' %}">Contact</a>
+                    </li>
                     {% if user.is_authenticated %}
-                    <li>
-                        <a class="dropdown-item" href="{% url 'dashboard' %}">
-                            <i class="bi bi-speedometer2 me-2"></i>Dashboard
-                        </a>
+                    <li class="nav-item">
+                        <a class="nav-link {% if 'dashboard' in request.path %}active{% endif %}" href="{% url 'dashboard_redirect' %}">Dashboard</a>
                     </li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li>
-                        <form method="post" action="{% url 'logout' %}">
-                            {% csrf_token %}
-                            <button type="submit" class="dropdown-item text-danger w-100 text-start">
-                                <i class="bi bi-box-arrow-right me-2"></i>Logout
-                            </button>
-                        </form>
-                        
-                    </li>
-                    {% else %}
-                    <li>
-                        <a class="dropdown-item" href="{% url 'login' %}">
-                            <i class="bi bi-box-arrow-in-right me-2"></i>Login
-                        </a>
-                    </li>
-                    <li>
-                        <a class="dropdown-item" href="{% url 'signup' %}">
-                            <i class="bi bi-person-plus me-2"></i>Signup
-                        </a>
-                    </li>
-                    
                     {% endif %}
                 </ul>
-            </div>
-        </div>
-    </div>
-</nav>
-
-<!-- Show success message if logout occurred -->
-{% if messages %}
-  <div class="container mt-5 pt-5">
-    {% for message in messages %}
-      <div class="alert alert-info alert-dismissible fade show" role="alert">
-        {{ message }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-      </div>
-    {% endfor %}
-  </div>
-{% endif %}
-
-<!-- Main Content -->
-<main class="mt-3">
-    {% block content %}{% endblock %}
-</main>
-
-<!-- Footer -->
-<footer class="bg-dark text-white py-5 mt-5">
-    <div class="container">
-        <div class="row g-4 align-items-center">
-            <div class="col-md-6">
-                <i class="bi bi-bus-front-fill fs-3"></i> JU Transport
-                <p class="mt-3 small">Jahangirnagar University - Smart Transport System • Since 2023</p>
-            </div>
-            <div class="col-md-6 text-end">
-                <div class="d-flex gap-3 justify-content-end">
-                    <a href="#" class="text-white"><i class="bi bi-facebook fs-5"></i></a>
-                    <a href="#" class="text-white"><i class="bi bi-linkedin fs-5"></i></a>
-                    <a href="#" class="text-white"><i class="bi bi-twitter fs-5"></i></a>
+                
+                <div class="d-flex align-items-center">
+                    {% if user.is_authenticated %}
+                        <div class="dropdown">
+                            <button class="btn btn-outline-primary dropdown-toggle d-flex align-items-center" type="button" id="userMenu" data-bs-toggle="dropdown">
+                                <i class="bi bi-person-circle me-2"></i>
+                                <span class="d-none d-md-inline">{{ user.get_short_name }}</span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'dashboard_redirect' %}">
+                                        <i class="bi bi-speedometer2 me-2"></i> Dashboard
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'profile' %}">
+                                        <i class="bi bi-person me-2"></i> Profile
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <form method="post" action="{% url 'logout' %}" class="mb-0">
+                                        {% csrf_token %}
+                                        <button type="submit" class="dropdown-item">
+                                            <i class="bi bi-box-arrow-right me-2"></i> Logout
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
+                    {% else %}
+                        <a href="{% url 'login' %}" class="btn btn-outline-primary me-2">Login</a>
+                        <a href="{% url 'signup' %}" class="btn btn-primary">Sign Up</a>
+                    {% endif %}
                 </div>
             </div>
         </div>
-    </div>
-</footer>
+    </nav>
 
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Messages -->
+    {% if messages %}
+    <div class="container mt-5 pt-5">
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show rounded-lg" role="alert">
+                <div class="d-flex align-items-center">
+                    <i class="bi 
+                        {% if message.tags == 'success' %}bi-check-circle-fill
+                        {% elif message.tags == 'error' %}bi-exclamation-circle-fill
+                        {% else %}bi-info-circle-fill{% endif %} 
+                        me-2"></i>
+                    <div>{{ message }}</div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Main Content -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-lg-4">
+                    <div class="footer-logo">
+                        <i class="bi bi-bus-front-fill fs-3"></i> JU Transport
+                    </div>
+                    <p style="color: white;">Advanced transport management system for Jahangirnagar University with online reservation, scheduling, and fleet management.</p>
+                    <div class="social-links mt-4">
+                        <a href="https://www.facebook.com/edu.juniv"><i class="bi bi-facebook"></i></a>
+                        <a href="#"><i class="bi bi-twitter-x"></i></a>
+                        <a href="#"><i class="bi bi-youtube"></i></a>
+                    </div>
+                </div>
+                
+                <div class="col-lg-2 col-md-4">
+                    <h5>System</h5>
+                    <ul class="footer-links">
+                        <li><a href="{% url 'homepage' %}">Home</a></li>
+                        <li><a href="{% url 'pricing' %}">Pricing</a></li>
+                        <li><a href="{% url 'contact' %}">Contact</a></li>
+                        <li><a href="#">Features</a></li>
+                    </ul>
+                </div>
+                
+                <div class="col-lg-3 col-md-4">
+                    <h5>Purpose</h5>
+                    <p style="color:white;">To modernize JU's transport management with online reservations, scheduling, and fleet management, replacing manual processes with an efficient digital system.</p>
+                </div>
+                
+                <div class="col-lg-3 col-md-4">
+                    <h5>Key Features</h5>
+                    <ul class="footer-links">
+                        <li><a href="#">Online Booking</a></li>
+                        <li><a href="#">Vehicle Management</a></li>
+                        <li><a href="#">Driver Scheduling</a></li>
+                        <li><a href="#">Payment Processing</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom pt-4 mt-4 border-top border-dark">
+                <div class="row align-items-center">
+                    <div class="col-md-6 text-center text-md-start">
+                        <p class="mb-0 text-muted">&copy; {% now "Y" %} JU Transport System. All rights reserved.</p>
+                    </div>
+                    <div class="col-md-6 text-center text-md-end">
+                        <p class="mb-0 text-muted">Jahangirnagar University, Savar, Dhaka-1342, Bangladesh</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Back to Top -->
+    <a href="#" class="back-to-top btn btn-primary rounded-circle shadow-lg" id="backToTop">
+        <i class="bi bi-arrow-up"></i>
+    </a>
+
+    <!-- JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    
+    <script>
+        // Initialize AOS animations
+        AOS.init({
+            duration: 800,
+            easing: 'ease-in-out',
+            once: true
+        });
+        
+        // Navbar scroll effect
+        window.addEventListener('scroll', function() {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+        
+        // Back to top button
+        const backToTop = document.getElementById('backToTop');
+        window.addEventListener('scroll', function() {
+            if (window.pageYOffset > 300) {
+                backToTop.classList.add('show');
+            } else {
+                backToTop.classList.remove('show');
+            }
+        });
+        
+        backToTop.addEventListener('click', function(e) {
+            e.preventDefault();
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        });
+        
+        // Initialize DataTables
+        $(document).ready(function() {
+            $('.data-table').DataTable({
+                responsive: true,
+                language: {
+                    search: "_INPUT_",
+                    searchPlaceholder: "Search...",
+                },
+                dom: '<"top"<"d-flex justify-content-between align-items-center"lf>><"table-responsive"rt><"bottom"<"d-flex justify-content-between align-items-center"ip>>',
+                initComplete: function() {
+                    $('.dataTables_filter input').addClass('form-control');
+                    $('.dataTables_length select').addClass('form-select');
+                }
+            });
+        });
+
+        // Form validation
+        (function() {
+            'use strict';
+            window.addEventListener('load', function() {
+                var forms = document.getElementsByClassName('needs-validation');
+                var validation = Array.prototype.filter.call(forms, function(form) {
+                    form.addEventListener('submit', function(event) {
+                        if (form.checkValidity() === false) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
+                        form.classList.add('was-validated');
+                    }, false);
+                });
+            }, false);
+        })();
+    </script>
+    
+    {% block extra_js %}{% endblock %}
 </body>
 </html>

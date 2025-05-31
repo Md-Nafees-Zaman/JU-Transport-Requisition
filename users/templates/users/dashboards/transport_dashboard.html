@@ -41,46 +41,215 @@
             </div>
         </div>
     </div>
-<!-- Application List Section -->
-<div class="card mb-4">
-    <div class="card-header bg-info text-white">
-        <i class="bi bi-file-earmark-text"></i> Transport Reservation Applications
-    </div>
-    <div class="card-body">
-        <table class="table table-bordered table-hover">
-            <thead>
-                <tr>
-                    <th>Reservation Date</th>
-                    <th>From - To</th>
-                    <th>Destination</th>
-                    <th>Reservation Type</th>
-                    <th>Transport Type</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for app in applications %}
-                <tr>
-                    <td>{{ app.reservation_date|date:"d M Y" }}</td>
-                    <td>{{ app.from_time }} - {{ app.to_time }}</td>
-                    <td>{{ app.destination }}</td>
-                    <td>{{ app.reservation_type }}</td>
-                    <td>{{ app.transport_type }}</td>
-                    <td>
-                        <!-- View Details Button -->
-                        <a href="{% url 'reservation_detail' app.id %}" class="btn btn-primary btn-sm">View Details</a>
-                    </td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="6" class="text-center text-muted">No transport reservations found</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-</div>
 
+    <!-- Application List Section -->
+    <div class="card mb-4">
+        <div class="card-header bg-info text-white">
+            <i class="bi bi-file-earmark-text"></i> Transport Reservation Applications
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>Reservation Date</th>
+                            <th>From - To</th>
+                            <th>Destination</th>
+                            <th>Reservation Type</th>
+                            <th>Transport Type</th>
+                            <th>Actions</th>
+                            <th>Availability</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for app in applications %}
+                        <tr>
+                            <td>{{ app.reservation_date|date:"d M Y" }}</td>
+                            <td>{{ app.from_time }} - {{ app.to_time }}</td>
+                            <td>{{ app.destination }}</td>
+                            <td>{{ app.reservation_type }}</td>
+                            <td>{{ app.transport_type }}</td>
+                            <td>
+                                <a href="{% url 'reservation_detail' app.id %}" class="btn btn-primary btn-sm">View Details</a>
+                            </td>
+                            <td>
+                                <button class="btn btn-info btn-sm text-white" 
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#availabilityModal"
+                                    data-reservation-date="{{ app.reservation_date|date:'Y-m-d' }}"
+                                    data-from-time="{{ app.from_time|time:'H:i:s' }}"
+                                    data-to-time="{{ app.to_time|time:'H:i:s' }}"
+                                    data-transport-type="{{ app.transport_type }}">
+                                    <i class="bi bi-calendar-check"></i> Check
+                                </button>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center text-muted">No transport reservations found</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Premium Pagination for Applications -->
+            {% if applications.paginator.num_pages > 1 %}
+            <div class="mt-4">
+                <nav aria-label="Applications pagination">
+                    <ul class="pagination pagination-lg justify-content-center">
+                        {% if applications.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page_applications=1" aria-label="First">
+                                    <i class="bi bi-chevron-double-left"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page_applications={{ applications.previous_page_number }}" aria-label="Previous">
+                                    <i class="bi bi-chevron-left"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+
+                        {% for num in applications.paginator.page_range %}
+                            {% if applications.number == num %}
+                                <li class="page-item active" aria-current="page">
+                                    <span class="page-link">{{ num }}</span>
+                                </li>
+                            {% elif num > applications.number|add:'-3' and num < applications.number|add:'3' %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page_applications={{ num }}">{{ num }}</a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if applications.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page_applications={{ applications.next_page_number }}" aria-label="Next">
+                                    <i class="bi bi-chevron-right"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page_applications={{ applications.paginator.num_pages }}" aria-label="Last">
+                                    <i class="bi bi-chevron-double-right"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                <div class="text-center text-muted mt-2">
+                    Showing {{ applications.start_index }}-{{ applications.end_index }} of {{ applications.paginator.count }} applications
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Messages from Contact Form -->
+    <div class="card mb-4">
+        <div class="card-header bg-warning text-dark">
+            <i class="bi bi-envelope"></i> Messages to Transport Office
+        </div>
+        <div class="card-body">
+            {% if django_messages %}
+            <div class="alert-container">
+                {% for message in django_messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Subject</th>
+                            <th>Message</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for msg in message_list %}
+                        <tr id="message-row-{{ msg.id }}">
+                            <td>{{ msg.name }}</td>
+                            <td>{{ msg.email }}</td>
+                            <td>{{ msg.subject }}</td>
+                            <td>{{ msg.message }}</td>
+                            <td>
+                                <form method="POST" action="{% url 'message_delete' msg.id %}" class="d-inline delete-form">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="message_id" value="{{ msg.id }}">
+                                    <button type="submit" class="btn btn-sm btn-danger">
+                                        <i class="bi bi-trash"></i> Delete
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center text-muted">No messages found</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Premium Pagination for Messages -->
+            {% if message_list.paginator.num_pages > 1 %}
+            <div class="mt-4">
+                <nav aria-label="Messages pagination">
+                    <ul class="pagination pagination-lg justify-content-center">
+                        {% if message_list.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page_messages=1" aria-label="First">
+                                    <i class="bi bi-chevron-double-left"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page_messages={{ message_list.previous_page_number }}" aria-label="Previous">
+                                    <i class="bi bi-chevron-left"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+
+                        {% for num in message_list.paginator.page_range %}
+                            {% if message_list.number == num %}
+                                <li class="page-item active" aria-current="page">
+                                    <span class="page-link">{{ num }}</span>
+                                </li>
+                            {% elif num > message_list.number|add:'-3' and num < message_list.number|add:'3' %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page_messages={{ num }}">{{ num }}</a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if message_list.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page_messages={{ message_list.next_page_number }}" aria-label="Next">
+                                    <i class="bi bi-chevron-right"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page_messages={{ message_list.paginator.num_pages }}" aria-label="Last">
+                                    <i class="bi bi-chevron-double-right"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                <div class="text-center text-muted mt-2">
+                    Showing {{ message_list.start_index }}-{{ message_list.end_index }} of {{ message_list.paginator.count }} messages
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
 
     <!-- Live Transport Map -->
     <div class="card mb-4">
@@ -114,12 +283,56 @@
             </div>
         </div>
     </div>
+
+    <!-- Availability Check Modal -->
+    <div class="modal fade" id="availabilityModal" tabindex="-1" aria-labelledby="availabilityModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="availabilityModalLabel">
+                        <i class="bi bi-calendar-check me-2"></i> Check Vehicle Availability
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="availabilityForm" method="post" action="{% url 'check_availability' %}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="id_reservation_date" class="form-label">Date</label>
+                            <input type="date" class="form-control" id="id_reservation_date" name="reservation_date" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="id_from_time" class="form-label">From</label>
+                            <input type="time" class="form-control" id="id_from_time" name="from_time" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="id_to_time" class="form-label">To</label>
+                            <input type="time" class="form-control" id="id_to_time" name="to_time" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="id_transport_type" class="form-label">Vehicle Type</label>
+                            <select class="form-select" id="id_transport_type" name="transport_type">
+                                <option value="">All Types</option>
+                                <option value="bus">Bus</option>
+                                <option value="car">Car</option>
+                                <option value="van">Micro</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">
+                            Check Availability
+                        </button>
+                    </form>
+                    <div id="availabilityResults"></div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
-<!-- Script Section for Map -->
+<!-- Map Script -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const map = L.map('transportMap').setView([{{ map_center|default:'23.7806,90.2792' }}], 13); // Default map center if not provided
+    const map = L.map('transportMap').setView([{{ map_center|default:'23.7806,90.2792' }}], 13);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
     {% for transport in active_transports %}
@@ -130,4 +343,309 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
+<!-- Message Delete Script -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.delete-form').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            if (confirm('Are you sure you want to delete this message?')) {
+                const formData = new FormData(this);
+                const messageId = formData.get('message_id');
+                const row = document.getElementById(`message-row-${messageId}`);
+
+                fetch(this.action, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRFToken': form.querySelector('[name=csrfmiddlewaretoken]').value
+                    },
+                    body: formData
+                })
+                .then(response => {
+                    if (!response.ok) throw new Error('Network error');
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.status === 'success') {
+                        row.remove();
+                        showToast('success', 'Message deleted successfully');
+                    } else {
+                        throw new Error(data.message);
+                    }
+                })
+                .catch(error => {
+                    showToast('danger', 'Error: ' + error.message);
+                });
+            }
+        });
+    });
+
+    function showToast(type, message) {
+        const toast = document.createElement('div');
+        toast.className = `toast show align-items-center text-white bg-${type} border-0`;
+        toast.setAttribute('role', 'alert');
+        toast.innerHTML = `
+            <div class="d-flex">
+                <div class="toast-body">${message}</div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        `;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    }
+});
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Auto-fill modal from table row
+        document.querySelectorAll('[data-bs-target="#availabilityModal"]').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const form = document.getElementById('availabilityForm');
+                form.reservation_date.value = this.dataset.reservationDate;
+                form.from_time.value = this.dataset.fromTime;
+                form.to_time.value = this.dataset.toTime;
+                form.transport_type.value = this.dataset.transportType || '';
+            });
+        });
+    
+        // Enhanced form submission
+        const availabilityForm = document.getElementById('availabilityForm');
+        if (availabilityForm) {
+            availabilityForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const submitBtn = this.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
+                const resultsDiv = document.getElementById('availabilityResults');
+                
+                // Show loading state
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = `
+                    <span class="spinner-border spinner-border-sm" role="status"></span>
+                    Checking...
+                `;
+                
+                resultsDiv.innerHTML = `
+                    <div class="text-center py-4">
+                        <div class="spinner-border text-primary"></div>
+                        <p class="mt-2">Checking real-time availability...</p>
+                    </div>
+                `;
+                
+                try {
+                    const formData = {
+                        reservation_date: this.reservation_date.value,
+                        from_time: this.from_time.value,
+                        to_time: this.to_time.value,
+                        transport_type: this.transport_type.value
+                    };
+                    
+                    // Client-side validation
+                    if (!formData.reservation_date || !formData.from_time || !formData.to_time) {
+                        throw new Error('Please fill all required fields');
+                    }
+                    
+                    if (formData.from_time >= formData.to_time) {
+                        throw new Error('End time must be after start time');
+                    }
+                    
+                    const response = await fetch(this.action, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                        },
+                        body: JSON.stringify(formData)
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (!response.ok) {
+                        throw new Error(data.message || 'Request failed');
+                    }
+                    
+                    resultsDiv.innerHTML = data.html;
+                    
+                } catch (error) {
+                    resultsDiv.innerHTML = `
+                        <div class="alert alert-danger">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            ${error.message}
+                        </div>
+                    `;
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalText;
+                }
+            });
+        }
+    });
+</script>
+    
+<!-- Premium Pagination Styling -->
+<style>
+    /* Premium Pagination Styles */
+    .pagination {
+        margin: 2rem 0;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .page-link {
+        color: #4a5568;
+        border: none;
+        margin: 0 3px;
+        min-width: 45px;
+        height: 45px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        font-weight: 600;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        background-color: #f8fafc;
+        border: 1px solid #e2e8f0;
+    }
+
+    .page-item.active .page-link {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-color: transparent;
+        color: white;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        transform: translateY(-2px);
+    }
+
+    .page-link:hover {
+        color: #4a5568;
+        background-color: #edf2f7;
+        border-color: #cbd5e0;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    .page-item.disabled .page-link {
+        color: #a0aec0;
+        background-color: #f8fafc;
+        border-color: #e2e8f0;
+        opacity: 0.7;
+    }
+
+    .page-item:first-child .page-link,
+    .page-item:last-child .page-link {
+        border-radius: 8px !important;
+        padding: 0 15px;
+    }
+
+    .page-item .bi {
+        font-size: 1.1rem;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .pagination {
+            flex-wrap: wrap;
+        }
+        
+        .page-link {
+            min-width: 40px;
+            height: 40px;
+            margin: 2px;
+            font-size: 0.9rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .pagination {
+            margin: 1rem 0;
+        }
+        
+        .page-link {
+            min-width: 36px;
+            height: 36px;
+            font-size: 0.85rem;
+        }
+        
+        .page-item:first-child .page-link,
+        .page-item:last-child .page-link {
+            padding: 0 10px;
+        }
+    }
+
+    /* Toast and Alert Container - fixed position for notifications */
+    .toast, .alert-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1100;
+        min-width: 300px;
+    }
+    
+    /* Availability Results Styling */
+    .available-vehicles {
+        background-color: #f8f9fa;
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        border: 1px solid #dee2e6;
+    }
+    
+    .available-vehicles h5 {
+        color: #198754;
+        font-weight: 600;
+    }
+    
+    .conflicting-reservations {
+        background-color: #fff3cd;
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        border: 1px solid #ffecb5;
+    }
+    
+    .conflicting-reservations h5 {
+        color: #dc3545;
+        font-weight: 600;
+    }
+    
+    /* Modal form styling */
+    #availabilityForm label.required::after {
+        content: " *";
+        color: #dc3545;
+    }
+    
+    /* Responsive table wrapper */
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    /* Availability results alerts */
+    #availabilityResults .alert {
+        border-left: 4px solid;
+    }
+    
+    #availabilityResults .alert-success {
+        border-left-color: #198754;
+    }
+    
+    #availabilityResults .alert-warning {
+        border-left-color: #ffc107;
+    }
+    
+    #availabilityResults .alert-danger {
+        border-left-color: #dc3545;
+    }
+    
+    /* Tables inside availability results */
+    #availabilityResults table {
+        font-size: 0.9rem;
+    }
+    
+    #availabilityResults table th {
+        white-space: nowrap;
+    }
+</style>
 {% endblock %}

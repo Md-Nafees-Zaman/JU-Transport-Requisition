@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-6">
+                <div class="card h-100">
+                    <div class="card-body p-4">
+                        <h1 class="mb-4">Get in Touch</h1>
+                        <p class="lead mb-4">Have questions about our transport system? Our team is here to help.</p>
+                        
+                        <form method="post" class="needs-validation" novalidate>
+                            {% csrf_token %}
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="name" class="form-label">Your Name</label>
+                                    <input type="text" class="form-control" id="name" name="name" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="email" class="form-label">Email Address</label>
+                                    <input type="email" class="form-control" id="email" name="email" required>
+                                </div>
+                                <div class="col-12">
+                                    <label for="subject" class="form-label">Subject</label>
+                                    <input type="text" class="form-control" id="subject" name="subject" required>
+                                </div>
+                                <div class="col-12">
+                                    <label for="message" class="form-label">Message</label>
+                                    <textarea class="form-control" id="message" name="message" rows="5" required></textarea>
+                                </div>
+                                <div class="col-12">
+                                    <button type="submit" class="btn btn-primary">Send Message</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-6">
+                <div class="card h-100">
+                    <div class="card-body p-4">
+                        <h2 class="mb-4">Contact Information</h2>
+                        
+                        <div class="mb-5">
+                            <h5 class="mb-3">Our Location</h5>
+                            <div class="d-flex">
+                                <i class="bi bi-geo-alt-fill text-primary me-3 mt-1"></i>
+                                <div>
+                                    <p class="mb-1">{{ location.address }}</p>
+                                    <a href="{{ location.map_url }}" target="_blank" class="text-primary">View on Map</a>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-5">
+                            <h5 class="mb-3">Departments</h5>
+                            {% for dept in departments %}
+                            <div class="mb-3">
+                                <h6 class="mb-2">{{ dept.name }}</h6>
+                                <div class="d-flex mb-1">
+                                    <i class="bi bi-envelope-fill text-primary me-3 mt-1"></i>
+                                    <a href="mailto:{{ dept.email }}">{{ dept.email }}</a>
+                                </div>
+                                <div class="d-flex mb-1">
+                                    <i class="bi bi-telephone-fill text-primary me-3 mt-1"></i>
+                                    <a href="tel:{{ dept.phone }}">{{ dept.phone }}</a>
+                                </div>
+                                <div class="d-flex">
+                                    <i class="bi bi-clock-fill text-primary me-3 mt-1"></i>
+                                    <span>{{ dept.hours }}</span>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div>
+                            <h5 class="mb-3">Emergency Contact</h5>
+                            <div class="d-flex align-items-center bg-primary-light p-3 rounded-lg">
+                                <i class="bi bi-exclamation-triangle-fill text-primary fs-3 me-3"></i>
+                                <div>
+                                    <p class="mb-1 fw-bold">For urgent transport issues</p>
+                                    <a href="tel:+8801712345678" class="text-primary fw-bold">+880 12345688</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

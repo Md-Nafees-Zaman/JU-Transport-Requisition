@@ -28,6 +28,13 @@ class TransportReservation(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     approval_status = models.CharField(max_length=10, choices=APPROVAL_STATUS, default='Pending')
     rejection_reason = models.TextField(null=True, blank=True)
+    transport = models.ForeignKey(
+        'transport.Transport', 
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='reservations'
+    )
 
     def __str__(self):
         return f"{self.user.username} - {self.reservation_date} ({self.transport_type})"
@@ -39,3 +46,21 @@ class TransportReservation(models.Model):
             'Approved': 'success',
             'Rejected': 'danger'
         }.get(self.approval_status, 'secondary')
+
+
+from django.db import models
+from django.contrib.auth.models import User
+
+class Message(models.Model):
+    name = models.CharField(max_length=100)
+    email = models.EmailField()
+    subject = models.CharField(max_length=200)
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_read = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Message from {self.name} - {self.subject}"
+
+    class Meta:
+        ordering = ['-created_at']

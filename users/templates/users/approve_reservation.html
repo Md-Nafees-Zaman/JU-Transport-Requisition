@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Approve Transport Reservation{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Approve Transport Reservation</h1>
+    </div>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Reservation Details</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <tbody>
+                        <tr>
+                            <th>Employee Name</th>
+                            <td>{{ reservation.user.name }}</td>
+                        </tr>
+                        <tr>
+                            <th>Employee ID</th>
+                            <td>{{ reservation.user.employee_ID }}</td>
+                        </tr>
+                        <tr>
+                            <th>Department</th>
+                            <td>{{ reservation.user.department }}</td>
+                        </tr>
+                        <tr>
+                            <th>Reservation Date</th>
+                            <td>{{ reservation.reservation_date|date:"Y-m-d" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Time Slot</th>
+                            <td>{{ reservation.from_time|time:"H:i" }} - {{ reservation.to_time|time:"H:i" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Destination</th>
+                            <td>{{ reservation.destination }}</td>
+                        </tr>
+                        <tr>
+                            <th>Transport Type</th>
+                            <td>{{ reservation.get_transport_type_display }}</td>
+                        </tr>
+                        <tr>
+                            <th>Reservation Type</th>
+                            <td>{{ reservation.get_reservation_type_display }}</td>
+                        </tr>
+                        <tr>
+                            <th>Current Status</th>
+                            <td>
+                                <span class="badge badge-{{ reservation.status_badge }}">
+                                    {{ reservation.get_approval_status_display }}
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="alert alert-info mt-4">
+                <i class="fas fa-info-circle"></i> Approving this reservation will automatically generate a payment request for the employee.
+            </div>
+
+            <form method="POST" class="mt-4">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="remarks">Approval Remarks (Optional)</label>
+                    <textarea class="form-control" id="remarks" name="remarks" rows="3"></textarea>
+                </div>
+
+                <div class="d-flex justify-content-between mt-4">
+                    <a href="{% url 'transport_dashboard' %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left mr-2"></i> Back to Dashboard
+                    </a>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-check-circle mr-2"></i> Confirm Approval
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Additional JavaScript if needed
+$(document).ready(function() {
+    // Confirm before approval
+    $('form').submit(function(e) {
+        if (!confirm('Are you sure you want to approve this reservation? A payment request will be generated.')) {
+            e.preventDefault();
+        }
+    });
+});
+</script>
+{% endblock %}

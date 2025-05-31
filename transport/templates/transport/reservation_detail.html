@@ -6,8 +6,7 @@
     
     <div class="row">
         <div class="col-md-6">
-            <p><strong>Applicant:</strong> {{ reservation.user.username }}</p>
-            <p><strong>Reservation Date:</strong> {{ reservation.reservation_date|date:"d M Y" }}</p>
+            <p><strong>Applicant:</strong> {{ reservation.user.name }} ({{ reservation.user.email }})</p>            <p><strong>Reservation Date:</strong> {{ reservation.reservation_date|date:"d M Y" }}</p>
             <p><strong>From:</strong> {{ reservation.from_time }}</p>
             <p><strong>To:</strong> {{ reservation.to_time }}</p>
             <p><strong>Destination:</strong> {{ reservation.destination }}</p>

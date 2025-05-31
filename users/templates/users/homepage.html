@@ -4,54 +4,493 @@
 {% block title %}Home | JU Transport{% endblock %}
 
 {% block content %}
-<section class="hero-section d-flex align-items-center" style="background: linear-gradient(to bottom, rgba(4, 120, 87, 0.8), rgba(5, 150, 105, 0.9)), url('{% static "images/buss.png" %}') center/cover;">
-    <div class="container hero-content text-center text-white">
-        <h1 class="display-4 fw-bold mb-4">Jahangirnagar University Transport System</h1>
-
-        <img src="{% static 'images/buss.png' %}" alt="Bus Illustration" class="hero-image img-fluid shadow-lg">
-
-        <p class="lead mb-4">Efficiently manage transportation, track buses, and streamline your daily commute across campus.</p>
-
-        {% if user.is_authenticated %}
-        <a href="{% url 'dashboard' %}" class="btn btn-green btn-lg px-5 py-3">
-            Go to Dashboard <i class="bi bi-arrow-right"></i>
+<!-- Hero Section with Parallax Effect -->
+<section class="hero-section position-relative overflow-hidden d-flex align-items-center" style="min-height: 100vh;">
+    <!-- Animated Background Elements -->
+    <div class="position-absolute w-100 h-100" style="z-index: 0;">
+        <div class="particles-js" id="particles-js"></div>
+        <div class="position-absolute top-0 start-0 w-100 h-100 bg-dark opacity-25"></div>
+    </div>
+    
+    <!-- Hero Content -->
+    <div class="container position-relative z-2">
+        <div class="row align-items-center">
+            <div class="col-lg-6 mb-5 mb-lg-0">
+                <h1 class="display-2 fw-bold mb-4 text-white" data-aos="fade-up">
+                    <span class="text-gradient-primary">Smart Transport</span> 
+                    <br>Requisition System
+                </h1>
+                <p class="lead mb-5 text-white-75" data-aos="fade-up" data-aos-delay="100">
+                    Revolutionizing campus transportation with real-time tracking, 
+                    optimized routes, and seamless fleet management for Jahangirnagar University.
+                </p>
+                
+                <div class="d-flex flex-wrap gap-3" data-aos="fade-up" data-aos-delay="200">
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'dashboard_redirect' %}" class="btn btn-primary btn-lg px-4 py-3 rounded-pill shadow-lg">
+                        Go to Dashboard <i class="bi bi-arrow-right ms-2"></i>
+                    </a>
+                    {% else %}
+                    <a href="{% url 'signup' %}" class="btn btn-primary btn-lg px-4 py-3 rounded-pill shadow-lg">
+                        Get Started <i class="bi bi-rocket ms-2"></i>
+                    </a>
+                    <a href="#features" class="btn btn-outline-light btn-lg px-4 py-3 rounded-pill">
+                        Learn More <i class="bi bi-chevron-down ms-2"></i>
+                    </a>
+                    {% endif %}
+                </div>
+                
+                <div class="d-flex align-items-center mt-5" data-aos="fade-up" data-aos-delay="300">
+                    <div class="d-flex">
+                        <img src="{% static 'images/avatars/avatar1.jpg' %}" class="rounded-circle border border-3 border-white" width="40" height="40" alt="User">
+                        <img src="{% static 'images/avatars/avatar2.jpg' %}" class="rounded-circle border border-3 border-white ms-n2" width="40" height="40" alt="User">
+                        <img src="{% static 'images/avatars/avatar3.jpg' %}" class="rounded-circle border border-3 border-white ms-n2" width="40" height="40" alt="User">
+                    </div>
+                    <div class="ms-3">
+                        <p class="mb-0 text-white small">Trusted by <span class="fw-bold">100+</span> users</p>
+                        <div class="text-warning small">
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-fill"></i>
+                            <span class="text-white-75 ms-1">5.0/5.0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-6" data-aos="fade-left" data-aos-delay="400">
+                <div class="position-relative">
+                    <img src="{% static 'images/buss.png' %}" alt="Bus Illustration" class="hero-image img-fluid shadow-lg rounded-4" style="transform: perspective(1000px) rotateY(-15deg);">
+                    <div class="position-absolute bottom-0 start-0 translate-middle bg-primary rounded-circle p-2 shadow" style="width: 120px; height: 120px;">
+                        <div class="bg-white rounded-circle w-100 h-100 d-flex align-items-center justify-content-center">
+                            <i class="bi bi-lightning-charge-fill text-primary fs-2"></i>
+                        </div>
+                    </div>
+                    <div class="position-absolute top-0 end-0 translate-middle bg-success rounded-4 p-3 shadow" style="width: 100px;">
+                        <div class="bg-white rounded-3 p-2 text-center">
+                            <p class="mb-0 fw-bold text-success">98%</p>
+                            <p class="mb-0 small">Efficiency</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Scroll Down Indicator -->
+    <div class="position-absolute bottom-0 start-50 translate-middle-x mb-5 z-2" data-aos="fade-up" data-aos-delay="500">
+        <a href="#features" class="text-white text-decoration-none">
+            <div class="d-flex flex-column align-items-center">
+                <p class="mb-2 small">Explore More</p>
+                <i class="bi bi-chevron-down fs-5 animate-bounce"></i>
+            </div>
         </a>
-        {% endif %}
     </div>
 </section>
 
-<section class="py-6 bg-dark text-white" id="features">
-    <div class="container">
-        <h2 class="display-4 fw-bold mb-4 text-center">Our Key Features</h2>
+<!-- Features Section -->
+<section id="features" class="py-8 bg-white position-relative overflow-hidden">
+    <!-- Decorative Elements -->
+    <div class="position-absolute top-0 start-0 w-100 h-100" style="background: url('{% static "images/pattern.png" %}') center/cover; opacity: 0.03; z-index: 0;"></div>
+    
+    <div class="container position-relative z-1">
+        <div class="row justify-content-center mb-6">
+            <div class="col-lg-8 text-center" data-aos="fade-up">
+                <span class="badge bg-primary-light text-primary rounded-pill px-3 py-2 mb-3">Key Features</span>
+                <h2 class="display-5 fw-bold mb-3">Advanced Transport Management</h2>
+                <p class="lead text-muted">Powerful features designed to optimize your campus transportation experience.</p>
+            </div>
+        </div>
+        
         <div class="row g-4">
-            <div class="col-md-4">
-                <div class="card h-100 border-0 card-hover p-4 shadow-sm" style="background-color: #f0f8ff;">
-                    <div class="feature-icon bg-success text-white mb-4">
-                        <i class="bi bi-geo-alt"></i>
+            <!-- Feature 1 -->
+            <div class="col-lg-4" data-aos="fade-up" data-aos-delay="100">
+                <div class="card h-100 border-0 p-4 shadow-sm-hover rounded-4 overflow-hidden" style="border-bottom: 4px solid #006F46;">
+                    <div class="feature-icon bg-gradient-primary text-white mb-4">
+                        <i class="bi bi-geo-alt-fill"></i>
                     </div>
-                    <h3 class="mb-3">Live Tracking</h3>
-                    <p class="text-muted">Real-time location tracking of university vehicles with GPS data.</p>
+                    <h3 class="mb-3">Real-Time GPS Tracking</h3>
+                    <p class="text-muted mb-4">Monitor all university vehicles in real-time with precise location data and movement history.</p>
+                    <ul class="list-unstyled">
+                        <li class="mb-2 d-flex align-items-center">
+                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                            <span>Live vehicle positions</span>
+                        </li>
+                        <li class="mb-2 d-flex align-items-center">
+                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                            <span>Route visualization</span>
+                        </li>
+                        <li class="d-flex align-items-center">
+                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                            <span>Speed monitoring</span>
+                        </li>
+                    </ul>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="card h-100 border-0 card-hover p-4 shadow-sm" style="background-color: #eafaf1;">
-                    <div class="feature-icon bg-info text-white mb-4">
-                        <i class="bi bi-graph-up-arrow"></i>
+            
+            <!-- Feature 2 -->
+            <div class="col-lg-4" data-aos="fade-up" data-aos-delay="200">
+                <div class="card h-100 border-0 p-4 shadow-sm-hover rounded-4 overflow-hidden" style="border-bottom: 4px solid #1A56DB;">
+                    <div class="feature-icon bg-gradient-info text-white mb-4">
+                        <i class="bi bi-bar-chart-line-fill"></i>
                     </div>
-                    <h3 class="mb-3">Data Insights</h3>
-                    <p class="text-muted">Analyze usage patterns and optimize routes based on real data.</p>
+                    <h3 class="mb-3">Advanced Analytics</h3>
+                    <p class="text-muted mb-4">Gain insights into transportation patterns with comprehensive data visualization tools.</p>
+                    <ul class="list-unstyled">
+                        <li class="mb-2 d-flex align-items-center">
+                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                            <span>Usage statistics</span>
+                        </li>
+                        <li class="mb-2 d-flex align-items-center">
+                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                            <span>Peak hour analysis</span>
+                        </li>
+                        <li class="d-flex align-items-center">
+                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                            <span>Fuel efficiency reports</span>
+                        </li>
+                    </ul>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="card h-100 border-0 card-hover p-4 shadow-sm" style="background-color: #f1fae1;">
-                    <div class="feature-icon bg-warning text-white mb-4">
-                        <i class="bi bi-shield-check"></i>
+            
+            <!-- Feature 3 -->
+            <div class="col-lg-4" data-aos="fade-up" data-aos-delay="300">
+                <div class="card h-100 border-0 p-4 shadow-sm-hover rounded-4 overflow-hidden" style="border-bottom: 4px solid #E74694;">
+                    <div class="feature-icon bg-gradient-accent text-white mb-4">
+                        <i class="bi bi-shield-lock-fill"></i>
                     </div>
-                    <h3 class="mb-3">Secure Access</h3>
-                    <p class="text-muted">User authentication and encrypted systems for protected access.</p>
+                    <h3 class="mb-3">Security & Access Control</h3>
+                    <p class="text-muted mb-4">Enterprise-grade security with role-based access control for all system users.</p>
+                    <ul class="list-unstyled">
+                        <li class="mb-2 d-flex align-items-center">
+                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                            <span>Multi-factor authentication</span>
+                        </li>
+                        <li class="mb-2 d-flex align-items-center">
+                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                            <span>Permission management</span>
+                        </li>
+                        <li class="d-flex align-items-center">
+                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                            <span>Activity logging</span>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>
     </div>
 </section>
+
+<!-- Stats Section -->
+<section class="py-6 bg-dark text-white position-relative">
+    <div class="position-absolute top-0 start-0 w-100 h-100" style="background: url('{% static "images/map-pattern.png" %}') center/cover; opacity: 0.05;"></div>
+    <div class="container position-relative z-1">
+        <div class="row g-4">
+            <div class="col-md-3 col-6 text-center" data-aos="fade-up">
+                <div class="display-4 fw-bold mb-2 text-gradient-primary">25+</div>
+                <p class="mb-0 text-white-75">University Vehicles</p>
+            </div>
+            <div class="col-md-3 col-6 text-center" data-aos="fade-up" data-aos-delay="100">
+                <div class="display-4 fw-bold mb-2 text-gradient-primary">150+</div>
+                <p class="mb-0 text-white-75">Daily Commuters</p>
+            </div>
+            <div class="col-md-3 col-6 text-center" data-aos="fade-up" data-aos-delay="200">
+                <div class="display-4 fw-bold mb-2 text-gradient-primary">98%</div>
+                <p class="mb-0 text-white-75">On-Time Performance</p>
+            </div>
+            <div class="col-md-3 col-6 text-center" data-aos="fade-up" data-aos-delay="300">
+                <div class="display-4 fw-bold mb-2 text-gradient-primary">24/7</div>
+                <p class="mb-0 text-white-75">System Uptime</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works Section -->
+<section id="solutions" class="py-8 bg-light position-relative">
+    <div class="container">
+        <div class="row justify-content-center mb-6">
+            <div class="col-lg-8 text-center" data-aos="fade-up">
+                <span class="badge bg-primary-light text-primary rounded-pill px-3 py-2 mb-3">How It Works</span>
+                <h2 class="display-5 fw-bold mb-3">Simple Yet Powerful Solution</h2>
+                <p class="lead text-muted">Three easy steps to transform your campus transportation experience.</p>
+            </div>
+        </div>
+        
+        <div class="row g-4 align-items-center">
+            <div class="col-lg-4" data-aos="fade-right">
+                <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">1</div>
+                        <h4 class="mb-0 ms-3">Track Vehicles</h4>
+                    </div>
+                    <p class="text-muted mb-0">Our GPS-enabled tracking devices provide real-time location data for all university vehicles.</p>
+                </div>
+                
+                <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">2</div>
+                        <h4 class="mb-0 ms-3">Monitor Activity</h4>
+                    </div>
+                    <p class="text-muted mb-0">View detailed reports on vehicle usage, routes, and performance metrics.</p>
+                </div>
+                
+                <div class="card border-0 shadow-sm rounded-4 p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">3</div>
+                        <h4 class="mb-0 ms-3">Optimize Routes</h4>
+                    </div>
+                    <p class="text-muted mb-0">Our AI-powered system suggests the most efficient routes based on real-time data.</p>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 text-center" data-aos="fade-up">
+                <div class="position-relative d-inline-block">
+                    <img src="{% static 'images/buss.png' %}" alt="Bus Illustration" class="img-fluid rounded-4 shadow-lg" style="max-height: 400px;">
+                    <div class="position-absolute top-0 start-0 translate-middle bg-white rounded-circle p-2 shadow" style="width: 80px; height: 80px;">
+                        <div class="bg-primary rounded-circle w-100 h-100 d-flex align-items-center justify-content-center">
+                            <i class="bi bi-phone text-white fs-3"></i>
+                        </div>
+                    </div>
+                    <div class="position-absolute bottom-0 end-0 translate-middle bg-white rounded-circle p-2 shadow" style="width: 80px; height: 80px;">
+                        <div class="bg-success rounded-circle w-100 h-100 d-flex align-items-center justify-content-center">
+                            <i class="bi bi-speedometer2 text-white fs-3"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4" data-aos="fade-left">
+                <div class="card border-0 bg-primary text-white rounded-4 p-5 shadow-lg">
+                    <h3 class="mb-4">Why Choose JU Transport?</h3>
+                    <div class="d-flex mb-4">
+                        <i class="bi bi-check-circle-fill fs-4 me-3"></i>
+                        <div>
+                            <h5 class="mb-1">University-Optimized</h5>
+                            <p class="small mb-0 opacity-75">Designed specifically for campus transportation needs.</p>
+                        </div>
+                    </div>
+                    <div class="d-flex mb-4">
+                        <i class="bi bi-check-circle-fill fs-4 me-3"></i>
+                        <div>
+                            <h5 class="mb-1">Cost Effective</h5>
+                            <p class="small mb-0 opacity-75">Reduce operational costs with efficient routing.</p>
+                        </div>
+                    </div>
+                    <div class="d-flex">
+                        <i class="bi bi-check-circle-fill fs-4 me-3"></i>
+                        <div>
+                            <h5 class="mb-1">User Friendly</h5>
+                            <p class="small mb-0 opacity-75">Intuitive interface for all user levels.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials Section -->
+<section class="py-8 bg-white">
+    <div class="container">
+        <div class="row justify-content-center mb-6">
+            <div class="col-lg-8 text-center" data-aos="fade-up">
+                <span class="badge bg-primary-light text-primary rounded-pill px-3 py-2 mb-3">Testimonials</span>
+                <h2 class="display-5 fw-bold mb-3">What Our JU Community Says</h2>
+                <p class="lead text-muted">Real experiences from our faculty, students, and staff</p>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <!-- Faculty Testimonial -->
+            <div class="col-lg-4" data-aos="fade-up">
+                <div class="card border-0 shadow-sm rounded-4 h-100">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center mb-4">
+                            <img src="{% static 'images/Avater.png' %}" class="rounded-circle me-3" width="50" height="50" alt="Professor">
+                            <div>
+                                <h5 class="mb-0">Dr. Abu Sayed Md. Mostafizur Rahaman </h5>
+                                <p class="small text-muted mb-0">Professor, JU</p>
+                            </div>
+                        </div>
+                        <p class="mb-0">"This system saves time and reduces hassle by delivering accurate results efficiently. It also helps a lot during emergencies by managing important tasks quickly and smoothly."</p>
+                    </div>
+                    <div class="card-footer bg-transparent border-0 pt-0 px-4 pb-4">
+                        <div class="text-warning">
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-half"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Student Testimonial -->
+            <div class="col-lg-4" data-aos="fade-up" data-aos-delay="100">
+                <div class="card border-0 shadow-sm rounded-4 h-100">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center mb-4">
+                            <img src="{% static 'images/Avater.png' %}" class="rounded-circle me-3" width="50" height="50" alt="Student">
+                            <div>
+                                <h5 class="mb-0">Md.Azmain Fayek</h5>
+                                <p class="small text-muted mb-0">Student,  Computer Science & Engineering,JU</p>
+                            </div>
+                        </div>
+                        <p class="mb-0">"During special events, arranging buses has become incredibly easy with this system. It ensures that we travel safely and without any last-minute stress, making the entire experience smooth and worry-free."</p>
+                    </div>
+                    <div class="card-footer bg-transparent border-0 pt-0 px-4 pb-4">
+                        <div class="text-warning">
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-fill"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Testimonial -->
+            <div class="col-lg-4" data-aos="fade-up" data-aos-delay="200">
+                <div class="card border-0 shadow-sm rounded-4 h-100">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center mb-4">
+                            <img src="{% static 'images/Avater.png' %}" class="rounded-circle me-3" width="50" height="50" alt="Admin">
+                            <div>
+                                <h5 class="mb-0">Md. Kamal Hossain</h5>
+                                <p class="small text-muted mb-0">Transport Office, JU</p>
+                            </div>
+                        </div>
+                        <p class="mb-0">"Since implementation, we've reduced vehicle idle time by 40% and increased daily trip capacity by 25% through optimized routing and scheduling."</p>
+                    </div>
+                    <div class="card-footer bg-transparent border-0 pt-0 px-4 pb-4">
+                        <div class="text-warning">
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-fill"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- CTA Section -->
+<section class="py-8 bg-gradient-primary text-white position-relative overflow-hidden">
+    <div class="position-absolute top-0 start-0 w-100 h-100" style="background: url('{% static "images/dots-pattern.png" %}') center/cover; opacity: 0.1;"></div>
+    <div class="container position-relative z-1">
+        <div class="row justify-content-center text-center">
+            <div class="col-lg-8" data-aos="fade-up">
+                <h2 class="display-5 fw-bold mb-4">Ready to Transform Your Campus Transport?</h2>
+                <p class="lead mb-5 opacity-75">Join hundreds of satisfied users who have revolutionized their transportation management.</p>
+                {% if user.is_authenticated %}
+                <a href="{% url 'dashboard_redirect' %}" class="btn btn-light btn-lg px-5 py-3 rounded-pill shadow">
+                    Go to Dashboard <i class="bi bi-arrow-right ms-2"></i>
+                </a>
+                {% else %}
+                <div class="d-flex flex-wrap gap-3 justify-content-center">
+                    <a href="{% url 'signup' %}" class="btn btn-light btn-lg px-5 py-3 rounded-pill shadow">
+                        Get Started Free <i class="bi bi-rocket ms-2"></i>
+                    </a>
+                    <a href="/contact" class="btn btn-outline-light btn-lg px-5 py-3 rounded-pill">
+                        Contact Us <i class="bi bi-chat-left-text ms-2"></i>
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Add this to your extra_js block or before closing body tag -->
+<script>
+    // Add these styles to your CSS
+    document.addEventListener('DOMContentLoaded', function() {
+        const style = document.createElement('style');
+        style.textContent = `
+            /* Gradient Text */
+            .text-gradient-primary {
+                background: linear-gradient(90deg, #006F46 0%, #00C853 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                text-fill-color: transparent;
+            }
+            
+            /* Gradient Background */
+            .bg-gradient-primary {
+                background: linear-gradient(135deg, #006F46 0%, #00C853 100%);
+            }
+            
+            .bg-gradient-info {
+                background: linear-gradient(135deg, #1A56DB 0%, #00B4D8 100%);
+            }
+            
+            .bg-gradient-accent {
+                background: linear-gradient(135deg, #E74694 0%, #FF6B6B 100%);
+            }
+            
+            /* Card Hover Effect */
+            .shadow-sm-hover {
+                transition: all 0.3s ease;
+            }
+            
+            .shadow-sm-hover:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1) !important;
+            }
+            
+            /* Particles JS Container */
+            #particles-js {
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                top: 0;
+                left: 0;
+            }
+            
+            /* Animate Bounce */
+            .animate-bounce {
+                animation: bounce 2s infinite;
+            }
+            
+            @keyframes bounce {
+                0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+                40% {transform: translateY(-10px);}
+                60% {transform: translateY(-5px);}
+            }
+            
+            /* Feature Icon */
+            .feature-icon {
+                width: 70px;
+                height: 70px;
+                border-radius: 18px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.75rem;
+                margin-bottom: 1.5rem;
+            }
+            
+            /* Hero Section */
+            .hero-section {
+                background: linear-gradient(135deg, rgba(0, 111, 70, 0.95) 0%, rgba(0, 85, 56, 0.95) 100%);
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Initialize particles.js if available
+        if (typeof particlesJS !== 'undefined') {
+            particlesJS.load('particles-js', '{% static "particles.json" %}');
+        }
+    });
+</script>
 {% endblock %}

@@ -1,0 +1,11 @@
+{# activation_email.txt #}
+{% autoescape off %}
+Hello {{ user.name }},
+
+Please activate your account by clicking this link:
+{{ protocol }}://{{ domain }}{% url 'activation_confirm' uidb64=uid token=token %}
+
+This link expires in 24 hours.
+
+JU Transport Team
+{% endautoescape %}

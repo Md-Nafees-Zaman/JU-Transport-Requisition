@@ -1,0 +1,19 @@
+<tr>
+    <td class="fw-semibold">#{{ req.id }}</td>
+    <td>{{ req.created_at|date:"d M Y" }}</td>
+    <td>{{ req.purpose|truncatechars:30 }}</td>
+    <td>
+        <span class="badge rounded-pill 
+            {% if req.approval_status == 'Pending' %}bg-warning text-dark
+            {% elif req.approval_status == 'Approved' %}bg-success
+            {% else %}bg-danger{% endif %}">
+            {{ req.get_approval_status_display }}
+        </span>
+    </td>
+    <td>{{ req.transport_date|date:"d M Y" }}</td>
+    <td>
+        <a href="{% url 'requisition_detail' req.id %}" class="btn btn-sm btn-outline-primary">
+            <i class="bi bi-eye"></i> View
+        </a>
+    </td>
+</tr>

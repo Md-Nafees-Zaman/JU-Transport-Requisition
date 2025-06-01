@@ -1,32 +1,41 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth import logout, login
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.views import LoginView, PasswordResetConfirmView
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.views import LoginView, PasswordResetConfirmView, PasswordResetView
 from django.urls import reverse, reverse_lazy
 from django.core.paginator import Paginator
-from django.db.models import Q
+from django.db.models import Q, Sum, Count, Max
 from django.views.generic import DetailView
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from django.contrib.auth.tokens import default_token_generator
-from .forms import RejectionForm, UserUpdateForm
 from django.utils import timezone
-from django.db.models import Max
-from django.contrib import messages as django_messages
+from django.http import HttpResponse, JsonResponse
+from django.template.loader import render_to_string
+from django.views.decorators.http import require_POST
+from django.contrib.auth.forms import SetPasswordForm
+from django.conf import settings
+from django.contrib.admin.views.decorators import staff_member_required
 
 from .forms import (
     UserRegistrationForm,
     UserUpdateForm,
     UserLoginForm,
     ActivationForm,
-    CustomPasswordResetForm
+    CustomPasswordResetForm,
+    RejectionForm
 )
-from .models import User
+from .models import User, Message, TransportPayment, LoginHistory
 from transport.models import Transport
 from employee.models import TransportReservation
+import json
+import logging
+from datetime import datetime, time
+
+logger = logging.getLogger(__name__)
 
 def register(request):
     """Registrar's view to create new users without passwords"""
@@ -95,15 +104,6 @@ def employee_dashboard(request):
     }
     return render(request, 'users/dashboards/employee_dashboard.html', context)
 
-from django.contrib import messages as django_messages
-from django.contrib.auth.decorators import login_required
-from django.core.paginator import Paginator
-from django.shortcuts import render, redirect
-from django.utils import timezone
-from employee.models import TransportReservation,Message
-from transport.models import Transport
-
-
 @login_required
 def transport_dashboard(request):
     """Transport officer dashboard with premium pagination"""
@@ -114,13 +114,13 @@ def transport_dashboard(request):
 
     # Paginate applications
     applications_list = TransportReservation.objects.all().order_by('-reservation_date')
-    paginator_applications = Paginator(applications_list, 10)  # Show 10 applications per page
+    paginator_applications = Paginator(applications_list, 10)
     page_number_applications = request.GET.get('page_applications', 1)
     applications = paginator_applications.get_page(page_number_applications)
 
     # Paginate messages
     messages_list = Message.objects.all().order_by('-created_at')
-    paginator_messages = Paginator(messages_list, 10)  # Show 10 messages per page
+    paginator_messages = Paginator(messages_list, 10)
     page_number_messages = request.GET.get('page_messages', 1)
     message_list = paginator_messages.get_page(page_number_messages)
 
@@ -133,15 +133,15 @@ def transport_dashboard(request):
         'available_vehicles': Transport.objects.filter(availability_status='available').count(),
         'active_transports': Transport.objects.filter(availability_status='available'),
         'message_list': message_list,
-        'django_messages': django_messages.get_messages(request),
+        'django_messages': messages.get_messages(request),
     }
     return render(request, 'users/dashboards/transport_dashboard.html', context)
+
 @login_required
 def registrar_dashboard(request):
     if request.user.role != 'registrar':
         return redirect('unauthorized')
 
-    # User management
     users = User.objects.all().order_by('-date_joined')
     query = request.GET.get('q')
     
@@ -166,13 +166,9 @@ def registrar_dashboard(request):
         'institution_name': "Jahangirnagar University",
         'academic_year': "2023/2024",
         'available_vehicles': Transport.objects.filter(availability_status='available').count(),
-
     }
     return render(request, 'users/dashboards/registrar_dashboard.html', context)
 
-from django.db.models import Sum, Count, Q
-from .models import TransportPayment, LoginHistory
-from employee.models import TransportReservation
 @login_required
 def bank_dashboard(request):
     if request.user.role != 'bank':
@@ -232,6 +228,7 @@ def bank_dashboard(request):
         }
     }
     return render(request, 'users/dashboards/bank_dashboard.html', context)
+
 @login_required
 def dashboard_redirect(request):
     """Redirect users to their appropriate dashboard"""
@@ -248,12 +245,6 @@ def logout_user(request):
     logout(request)
     messages.success(request, "")
     return redirect('homepage')
-
-from django.core.mail import send_mail
-from django.template.loader import render_to_string
-from django.utils.http import urlsafe_base64_encode
-from django.utils.encoding import force_bytes
-from django.contrib.auth.tokens import default_token_generator
 
 def signup(request):
     """Handle email verification requests"""
@@ -288,52 +279,28 @@ def signup(request):
     
     return render(request, 'users/signup.html', {'form': form})
 
-from django.contrib import messages
-from django.urls import reverse_lazy
-from django.contrib.auth.views import PasswordResetConfirmView
-from django.contrib.auth.forms import SetPasswordForm
-
 class ActivationConfirmView(PasswordResetConfirmView):
     """Handle account activation through password reset confirmation"""
     template_name = 'users/activation_confirm.html'
     form_class = SetPasswordForm
-    success_url = reverse_lazy('login')  # Redirect to login page after activation
+    success_url = reverse_lazy('login')
 
     def form_valid(self, form):
-        # Save password using parent's logic
         response = super().form_valid(form)
-        
-        # Get validated user from the view
         user = self.user
-        
-        # Activate and verify user
         user.is_active = True
         user.is_verified = True
         user.save(update_fields=['is_active', 'is_verified'])
-        
-        # Add success message that will persist through redirect
         messages.success(
             self.request,
             'Account successfully activated! Please log in with your new password.'
         )
-        
         return response
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['is_activation'] = True
         return context
-
-
-# forms.py
-from django.contrib.auth.forms import SetPasswordForm
-
-class CustomPasswordResetForm(SetPasswordForm):
-    # Custom styling or additional validation if needed
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        for field in self.fields.values():
-            field.widget.attrs.update({'class': 'form-control'})
 
 class UserProfileView(DetailView):
     """Public user profile view"""
@@ -351,17 +318,6 @@ def unauthorized(request):
     """Unauthorized access view"""
     return render(request, 'users/unauthorized.html', status=403)
 
-
-from django.contrib.auth import views as auth_views
-
-# Separate view for regular password resets
-class PasswordResetView(auth_views.PasswordResetView):
-    template_name = 'users/password_reset.html'
-    email_template_name = 'users/password_reset_email.html'
-    success_url = reverse_lazy('password_reset_done')
-
-
-
 @login_required
 def payment_detail(request, pk):
     payment = get_object_or_404(TransportPayment, pk=pk)
@@ -375,10 +331,8 @@ def approve_payment(request, pk):
         payment.processed_by = request.user
         payment.processed_at = timezone.now()
         payment.save()
-        
         messages.success(request, f"Payment #{payment.id} approved successfully.")
         return redirect('bank_dashboard')
-    
     return render(request, 'bank/confirm_approval.html', {'payment': payment})
 
 @login_required
@@ -392,7 +346,6 @@ def reject_payment(request, pk):
             payment.processed_at = timezone.now()
             payment.remarks = form.cleaned_data['remarks']
             payment.save()
-            
             messages.warning(request, f"Payment #{payment.id} has been rejected.")
             return redirect('bank_dashboard')
     else:
@@ -402,13 +355,6 @@ def reject_payment(request, pk):
         'payment': payment,
         'form': form
     })
-
-
-from django.http import HttpResponse, JsonResponse
-from django.template.loader import render_to_string
-from weasyprint import HTML
-import tempfile
-from django.db.models import Q
 
 def export_payments(request):
     """Export payments to PDF"""
@@ -433,8 +379,6 @@ def export_payments(request):
 
     return response
 
-
-
 @login_required
 def approve_reservation(request, pk):
     if request.user.role not in ['registrar', 'transport']:
@@ -444,8 +388,7 @@ def approve_reservation(request, pk):
     
     if request.method == 'POST':
         reservation.approval_status = 'Approved'
-        reservation.save()  # This will trigger the signal
-        
+        reservation.save()
         messages.success(request, 
             f"Reservation #{reservation.id} approved successfully. "
             "Payment request has been generated."
@@ -456,13 +399,7 @@ def approve_reservation(request, pk):
         'reservation': reservation
     })
 
-
-# transport/views.py
-from django.shortcuts import render
-from datetime import time
-
 def pricing(request):
-    # Define pricing structure
     vehicle_types = {
         'bus': {
             'name': 'University Bus',
@@ -493,7 +430,6 @@ def pricing(request):
             'icon': 'bi-truck-front'         }
     }
     
-    # Time-based multipliers
     time_slots = {
         'normal': {'name': 'Regular Hours (8AM-6PM)', 'multiplier': 1.0},
         'peak': {'name': 'Peak Hours (7-8AM, 6-8PM)', 'multiplier': 1.2},
@@ -501,7 +437,6 @@ def pricing(request):
         'emergency': {'name': 'Emergency (12AM-7AM)', 'multiplier': 2.0}
     }
     
-    # Additional services
     additional_services = [
         {'name': 'Driver Allowance (per hour)', 'price': 200},
         {'name': 'AC Service', 'price': 300},
@@ -562,13 +497,6 @@ def contact(request):
     }
     return render(request, 'users/contact.html', context)
 
-
-
-
-from django.core.mail import send_mail
-from django.conf import settings
-from .models import Message
-
 def contact_view(request):
     if request.method == 'POST':
         name = request.POST.get('name')
@@ -581,7 +509,6 @@ def contact_view(request):
                 'error': 'All fields are required.'
             })
 
-        # Save message to DB
         try:
             message = Message.objects.create(
                 name=name,
@@ -590,7 +517,6 @@ def contact_view(request):
                 message=message_text
             )
             
-            # Send email to admin
             send_mail(
                 f"Transport Message: {subject}",
                 f"From: {name} <{email}>\n\n{message_text}\n\n---\n"
@@ -611,29 +537,16 @@ def contact_view(request):
 
     return render(request, 'users/contact.html')
 
-from django.contrib.admin.views.decorators import staff_member_required
-
 @staff_member_required
 def message_list(request):
     all_messages = Message.objects.all().order_by('-created_at')
     return render(request, 'users/messages.html', {'messages': all_messages})
 
-from django.http import JsonResponse
-from django.views.decorators.http import require_POST
-from django.contrib.auth.decorators import login_required
-from .models import Message
-
 @login_required
 @require_POST
 def message_delete(request, message_id):
     try:
-        # Get message and verify ownership or permissions
         msg = Message.objects.get(id=message_id)
-        
-        # Add any additional permission checks here if needed
-        # Example: if not request.user.is_staff and msg.user != request.user:
-        #     return JsonResponse({'status': 'error', 'message': 'Not authorized'}, status=403)
-        
         msg.delete()
         return JsonResponse({'status': 'success', 'message': 'Message deleted'})
     
@@ -642,17 +555,7 @@ def message_delete(request, message_id):
     
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
-    
 
-from django.http import JsonResponse
-from django.views.decorators.http import require_POST
-import json
-import logging
-from django.core.exceptions import ValidationError
-from django.template.loader import render_to_string
-from datetime import datetime, time
-
-logger = logging.getLogger(__name__)
 @require_POST
 def check_availability(request):
     """Handle vehicle availability check with type counts"""
@@ -669,22 +572,19 @@ def check_availability(request):
             if from_time >= to_time:
                 raise ValidationError("End time must be after start time")
 
-            # Get total counts of each vehicle type
             vehicle_counts = {
                 'bus': Transport.objects.filter(type='bus', availability_status='available').count(),
                 'car': Transport.objects.filter(type='car', availability_status='available').count(),
                 'micro': Transport.objects.filter(type='micro', availability_status='available').count()
             }
 
-            # Get conflicting transport IDs for the time slot
             conflicting_ids = TransportReservation.objects.filter(
                 reservation_date=date,
-                approval_status='Approved'  # Only count approved reservations
+                approval_status='Approved'
             ).filter(
                 Q(from_time__lt=to_time) & Q(to_time__gt=from_time)
             ).values_list('transport_id', flat=True)
 
-            # Get available counts by type
             available_query = Transport.objects.filter(
                 availability_status='available'
             ).exclude(
@@ -720,12 +620,6 @@ def check_availability(request):
     except Exception as e:
         logger.critical(f"Unexpected error: {str(e)}")
         return JsonResponse({'status': 'error', 'message': 'System error'}, status=500)
-    
-
-
-from django.contrib.auth.decorators import login_required, user_passes_test
-from django.shortcuts import get_object_or_404, redirect
-from django.contrib import messages
 
 @login_required
 @user_passes_test(lambda u: u.role == 'registrar', login_url='homepage')
@@ -733,7 +627,6 @@ def delete_user(request, user_id):
     if request.method == 'POST':
         user_to_delete = get_object_or_404(User, id=user_id)
         
-        # Prevent self-deletion and deletion of other registrars
         if user_to_delete == request.user:
             messages.error(request, "You cannot delete your own account!")
         elif user_to_delete.role == 'registrar' and not request.user.is_superuser:
@@ -744,5 +637,4 @@ def delete_user(request, user_id):
         
         return redirect('registrar_dashboard')
     
-    # If not POST, redirect to dashboard
     return redirect('registrar_dashboard')

@@ -7,32 +7,32 @@
     <div class="container">
         <div class="row g-4">
             <div class="col-lg-6">
-                <div class="card h-100">
-                    <div class="card-body p-4">
-                        <h1 class="mb-4">Get in Touch</h1>
-                        <p class="lead mb-4">Have questions about our transport system? Our team is here to help.</p>
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body p-4 p-lg-5">
+                        <h1 class="mb-4 fw-bold">Get in Touch</h1>
+                        <p class="lead text-muted mb-4">Have questions about our transport system? Our dedicated team is here to assist you.</p>
                         
                         <form method="post" class="needs-validation" novalidate>
                             {% csrf_token %}
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <label for="name" class="form-label">Your Name</label>
-                                    <input type="text" class="form-control" id="name" name="name" required>
+                                    <input type="text" class="form-control rounded-pill" id="name" name="name" required>
                                 </div>
                                 <div class="col-md-6">
                                     <label for="email" class="form-label">Email Address</label>
-                                    <input type="email" class="form-control" id="email" name="email" required>
+                                    <input type="email" class="form-control rounded-pill" id="email" name="email" required>
                                 </div>
                                 <div class="col-12">
                                     <label for="subject" class="form-label">Subject</label>
-                                    <input type="text" class="form-control" id="subject" name="subject" required>
+                                    <input type="text" class="form-control rounded-pill" id="subject" name="subject" required>
                                 </div>
                                 <div class="col-12">
                                     <label for="message" class="form-label">Message</label>
-                                    <textarea class="form-control" id="message" name="message" rows="5" required></textarea>
+                                    <textarea class="form-control" id="message" name="message" rows="5" required style="border-radius: 16px;"></textarea>
                                 </div>
-                                <div class="col-12">
-                                    <button type="submit" class="btn btn-primary">Send Message</button>
+                                <div class="col-12 pt-2">
+                                    <button type="submit" class="btn btn-primary rounded-pill px-4 py-2 fw-bold">Send Message <i class="bi bi-send-fill ms-2"></i></button>
                                 </div>
                             </div>
                         </form>
@@ -41,50 +41,72 @@
             </div>
             
             <div class="col-lg-6">
-                <div class="card h-100">
-                    <div class="card-body p-4">
-                        <h2 class="mb-4">Contact Information</h2>
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body p-4 p-lg-5">
+                        <h2 class="mb-4 fw-bold">Contact Information</h2>
                         
                         <div class="mb-5">
-                            <h5 class="mb-3">Our Location</h5>
-                            <div class="d-flex">
-                                <i class="bi bi-geo-alt-fill text-primary me-3 mt-1"></i>
-                                <div>
-                                    <p class="mb-1">{{ location.address }}</p>
-                                    <a href="{{ location.map_url }}" target="_blank" class="text-primary">View on Map</a>
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="bg-primary bg-opacity-10 p-2 rounded-circle me-3">
+                                    <i class="bi bi-geo-alt-fill text-primary fs-5"></i>
                                 </div>
+                                <h5 class="mb-0 fw-bold">Our Location</h5>
+                            </div>
+                            <div class="ps-5">
+                                <p class="mb-2">Transport Office, Jahangirnagar University</p>
+                                <p class="mb-3">Savar, Dhaka-1342, Bangladesh</p>
+                                <a href="https://www.google.com/maps/place/Jahangirnagar+University/@23.8829074,90.2669693,17z/data=!3m1!4b1!4m6!3m5!1s0x3755e9d9b6487f07:0x4a01f8b7a0e7cb1!8m2!3d23.8829074!4d90.2695442!16zL20vMDZtN3Y0?entry=ttu" 
+                                   target="_blank" 
+                                   class="btn btn-outline-primary rounded-pill px-3">
+                                    <i class="bi bi-map me-2"></i>View on Google Maps
+                                </a>
                             </div>
                         </div>
                         
                         <div class="mb-5">
-                            <h5 class="mb-3">Departments</h5>
-                            {% for dept in departments %}
-                            <div class="mb-3">
-                                <h6 class="mb-2">{{ dept.name }}</h6>
-                                <div class="d-flex mb-1">
-                                    <i class="bi bi-envelope-fill text-primary me-3 mt-1"></i>
-                                    <a href="mailto:{{ dept.email }}">{{ dept.email }}</a>
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="bg-primary bg-opacity-10 p-2 rounded-circle me-3">
+                                    <i class="bi bi-building text-primary fs-5"></i>
                                 </div>
-                                <div class="d-flex mb-1">
-                                    <i class="bi bi-telephone-fill text-primary me-3 mt-1"></i>
-                                    <a href="tel:{{ dept.phone }}">{{ dept.phone }}</a>
-                                </div>
-                                <div class="d-flex">
-                                    <i class="bi bi-clock-fill text-primary me-3 mt-1"></i>
-                                    <span>{{ dept.hours }}</span>
-                                </div>
+                                <h5 class="mb-0 fw-bold">Departments</h5>
                             </div>
-                            {% endfor %}
+                            <div class="ps-5">
+                                {% for dept in departments %}
+                                <div class="mb-4 pb-2 border-bottom border-light">
+                                    <h6 class="mb-2 fw-bold text-primary">{{ dept.name }}</h6>
+                                    <div class="d-flex mb-2">
+                                        <i class="bi bi-envelope-fill text-muted me-3 mt-1"></i>
+                                        <a href="mailto:{{ dept.email }}" class="text-decoration-none">{{ dept.email }}</a>
+                                    </div>
+                                    <div class="d-flex mb-2">
+                                        <i class="bi bi-telephone-fill text-muted me-3 mt-1"></i>
+                                        <a href="tel:{{ dept.phone }}" class="text-decoration-none">{{ dept.phone }}</a>
+                                    </div>
+                                    <div class="d-flex">
+                                        <i class="bi bi-clock-fill text-muted me-3 mt-1"></i>
+                                        <span class="text-muted">{{ dept.hours }}</span>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
                         </div>
                         
                         <div>
-                            <h5 class="mb-3">Emergency Contact</h5>
-                            <div class="d-flex align-items-center bg-primary-light p-3 rounded-lg">
-                                <i class="bi bi-exclamation-triangle-fill text-primary fs-3 me-3"></i>
-                                <div>
-                                    <p class="mb-1 fw-bold">For urgent transport issues</p>
-                                    <a href="tel:+8801712345678" class="text-primary fw-bold">+880 12345688</a>
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="bg-primary bg-opacity-10 p-2 rounded-circle me-3">
+                                    <i class="bi bi-exclamation-triangle-fill text-primary fs-5"></i>
                                 </div>
+                                <h5 class="mb-0 fw-bold">Emergency Contact</h5>
+                            </div>
+                            <div class="ps-5">
+                                <div class="d-flex align-items-center bg-danger bg-opacity-10 p-3 rounded-lg">
+                                    <i class="bi bi-telephone-fill text-danger fs-4 me-3"></i>
+                                    <div>
+                                        <p class="mb-1 fw-bold text-danger">24/7 Transport Emergency Line</p>
+                                        <a href="tel:+8801712345678" class="text-danger fw-bold fs-5 text-decoration-none">+880 1234 5688</a>
+                                    </div>
+                                </div>
+                                <p class="small text-muted mt-2">For immediate assistance with transport emergencies only</p>
                             </div>
                         </div>
                     </div>

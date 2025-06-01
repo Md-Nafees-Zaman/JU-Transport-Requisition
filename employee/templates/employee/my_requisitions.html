@@ -1,0 +1,270 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<div class="dashboard-wrapper">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <img src="{% static 'images/ju.png' %}" alt="JU Transport">
+            <span class="ms-2 fw-bold">JU Transport</span>
+        </div>
+        
+        <ul class="nav flex-column sidebar-nav">
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'employee_dashboard' %}">
+                    <i class="bi bi-speedometer2 me-2"></i> Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'reserve_transport' %}">
+                    <i class="bi bi-car-front me-2"></i> Reserve Transport
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active" href="{% url 'my_requisitions' %}">
+                    <i class="bi bi-list-check me-2"></i> My Requisitions
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'profile' %}">
+                    <i class="bi bi-person-gear me-2"></i> My Profile
+                </a>
+            </li>
+        </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="fw-bold mb-2">My Requisitions</h1>
+                <p class="text-muted mb-0">
+                    <span class="badge bg-primary-light text-primary">{{ request.user.department }} Department</span>
+                    <span class="mx-2">•</span>
+                    Employee ID: {{ request.user.employee_ID }}
+                </p>
+            </div>
+            <a href="{% url 'reserve_transport' %}" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-1"></i> New Requisition
+            </a>
+        </div>
+
+        <!-- Status Tabs -->
+        <ul class="nav nav-tabs mb-4" id="requisitionTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="all-tab" data-bs-toggle="tab" data-bs-target="#all" type="button" role="tab">
+                    All Requisitions
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending" type="button" role="tab">
+                    Pending ({{ pending_requisitions.count }})
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="approved-tab" data-bs-toggle="tab" data-bs-target="#approved" type="button" role="tab">
+                    Approved ({{ approved_requisitions.count }})
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="rejected-tab" data-bs-toggle="tab" data-bs-target="#rejected" type="button" role="tab">
+                    Rejected ({{ rejected_requisitions.count }})
+                </button>
+            </li>
+        </ul>
+
+        <!-- Tab Content -->
+        <div class="tab-content" id="requisitionTabsContent">
+            <!-- All Requisitions -->
+            <div class="tab-pane fade show active" id="all" role="tabpanel">
+                <div class="card shadow-sm">
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Req ID</th>
+                                        <th>Date</th>
+                                        <th>Purpose</th>
+                                        <th>Status</th>
+                                        <th>Transport Date</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for req in pending_requisitions %}
+                                    {% include 'employee/_requisition_row.html' %}
+                                    {% endfor %}
+                                    {% for req in approved_requisitions %}
+                                    {% include 'employee/_requisition_row.html' %}
+                                    {% endfor %}
+                                    {% for req in rejected_requisitions %}
+                                    {% include 'employee/_requisition_row.html' %}
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pending Requisitions -->
+            <div class="tab-pane fade" id="pending" role="tabpanel">
+                <div class="card shadow-sm">
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Req ID</th>
+                                        <th>Date</th>
+                                        <th>Purpose</th>
+                                        <th>Status</th>
+                                        <th>Transport Date</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for req in pending_requisitions %}
+                                    {% include 'employee/_requisition_row.html' %}
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="6" class="text-center py-4 text-muted">
+                                            No pending requisitions found
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Approved Requisitions -->
+            <div class="tab-pane fade" id="approved" role="tabpanel">
+                <div class="card shadow-sm">
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Req ID</th>
+                                        <th>Date</th>
+                                        <th>Purpose</th>
+                                        <th>Status</th>
+                                        <th>Transport Date</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for req in approved_requisitions %}
+                                    {% include 'employee/_requisition_row.html' %}
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="6" class="text-center py-4 text-muted">
+                                            No approved requisitions found
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rejected Requisitions -->
+            <div class="tab-pane fade" id="rejected" role="tabpanel">
+                <div class="card shadow-sm">
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Req ID</th>
+                                        <th>Date</th>
+                                        <th>Purpose</th>
+                                        <th>Status</th>
+                                        <th>Transport Date</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for req in rejected_requisitions %}
+                                    {% include 'employee/_requisition_row.html' %}
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="6" class="text-center py-4 text-muted">
+                                            No rejected requisitions found
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .sidebar {
+        background: white;
+        border-right: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    
+    .sidebar-nav .nav-link {
+        border-radius: 8px;
+        margin: 0.25rem 0.75rem;
+        padding: 0.75rem 1rem;
+        color: var(--gray);
+        transition: var(--transition);
+    }
+    
+    .sidebar-nav .nav-link:hover {
+        background: var(--primary-light);
+        color: var(--primary);
+    }
+    
+    .sidebar-nav .nav-link.active {
+        background: var(--primary);
+        color: white;
+    }
+    
+    .main-content {
+        padding: 2rem;
+    }
+    
+    .card {
+        border: none;
+        border-radius: 0.5rem;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    }
+    
+    .table thead th {
+        border-bottom: none;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.5px;
+        color: var(--gray);
+    }
+    
+    .badge-pending {
+        background-color: #ffc107;
+        color: #000;
+    }
+    
+    .badge-approved {
+        background-color: #28a745;
+        color: #fff;
+    }
+    
+    .badge-rejected {
+        background-color: #dc3545;
+        color: #fff;
+    }
+</style>
+{% endblock %}
